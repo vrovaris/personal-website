@@ -6,7 +6,7 @@ The permanent record of every decision made on this project, why it was made, an
 
 ## How to use this file
 
-**Before starting work:** read `AGENTS.md`, then this file top to bottom, then `portfolio-site-plan.md`. If this file and the plan disagree, **this file wins** and the plan gets patched to match.
+**Before starting work:** read `AGENTS.md` at the repository root, then this file top to bottom, then `docs/plan.md`. If this file and the plan disagree, **this file wins** and the plan gets patched to match.
 
 **Before ending a session:** append every decision made during it. A decision is anything that closes an option — a technology chosen, a scope cut, a ruling received, a constraint discovered, a default set because nobody answered a question. If a session produced no entry here, treat that as a bug in the session.
 
@@ -62,8 +62,13 @@ Consequences: …
 | D26 | Repository names as created | active, renames the table in D21 |
 | D27 | Local layout: four sibling repos under a non-repo parent | active |
 | D28 | No machine-local paths or hostnames in committed documents | active |
+| D29 | Human in the loop: plan-approve-build-walkthrough, and a hard simplicity rule | active |
+| D30 | Practice documents, shared by symlink between providers | active |
+| D31 | What never enters the public repository | active |
+| D32 | Repo private until launch; docs under `docs/` | active |
+| D33 | Symlinks are tracked; machine-local Claude state is not | active |
 
-**Next free ID: D29.**
+**Next free ID: D34.**
 
 ---
 
@@ -288,3 +293,78 @@ Consequences:
 - Transfer commands and local setup steps stay out of the repository entirely. They belong in a scratch note on Vitor's machine.
 - **No third-party names.** Instructors, peers, classmates, colleagues, and their personal websites are referred to by role, never by name or URL. Paraphrasing a private email in a public repository is discourteous even when the content is neutral, and a design note that reads as criticism of a friend's site is worse. Describe the pattern, not the person.
 - Directory naming convention on disk: lowercase, hyphenated, no spaces, for the benefit of `make`, Emscripten, and any tool that mishandles quoting.
+
+
+---
+
+## 2026-09-11 — How agents work
+
+**D29 — Agents stop for approval before building and explain their work afterwards, and are held to a hard simplicity requirement.** *(decided by: Vitor · active)*
+Reasoning: Vitor reviews every line and intends to understand how the site works rather than accumulate code he cannot maintain. Separately, the characteristic failure of agent-written code is not incorrectness but volume — plausible, well-structured, generously abstracted code that passes review because nothing in it is *wrong* and then has to be carried forever.
+Consequences:
+1. **Three checkpoints per ticket:** a plan posted before any code and waiting for a reply; a stop at the first surprise instead of a silent workaround; a walkthrough in the PR covering what changed, how it works, why this way, what to read closely, and the strongest honest criticism of the work.
+2. **Simplicity is a hard constraint, not a preference.** The rules live in `docs/practices/simplicity.md`. Size is a defect independent of correctness.
+3. **Roughly 300 lines of new code per PR is a ceiling.** Approaching it means the ticket should be split.
+4. **No refactor mixed with a feature.** No drive-by fixes.
+5. **If Vitor cannot follow the code after one explanation, the code gets simplified** — not explained again. That rule points at the code, never at the reader, and is the most reliable over-engineering signal available.
+6. Explanations assume a systems programmer who writes C and Python and has not used the web framework. Explain the framework; never explain the fundamentals.
+
+**D30 — Practice documents live in `docs/practices/` and are shared with Claude Code by symlink.** *(decided by: recommendation · active · serves D19)*
+Reasoning: skills are a Claude Code convention; the work will move to another provider later. Duplicating the content into a provider-specific folder guarantees the two copies drift.
+Consequences:
+- Canonical content is `docs/practices/<name>.md`, plain Markdown with a small YAML header that other tools ignore harmlessly.
+- `.claude/skills/<name>/SKILL.md` is a **symlink** to the canonical file. `setup-practices.sh` creates them. Editing a skill means editing the canonical file; there is never a second copy.
+- `AGENTS.md` lists the documents and when to read each, so an assistant with no skill mechanism still finds them.
+- Seven documents at launch: `simplicity`, `code-review`, `frontend`, `backend`, `deployment`, `native-wasm`, `content-writing`. A new one needs a reason beyond wanting somewhere to put a note.
+
+
+---
+
+## 2026-09-11 — What never enters the public repository
+
+**D31 — Four categories stay out of `personal-website`, and three of them are easy to leak by accident.** *(decided by: recommendation · active · extends D28)*
+
+**1. Secrets, always and everywhere.** `.env`, `.dev.vars`, Wrangler secrets, the guestbook IP salt, bearer tokens, private keys, certificates. If one is ever committed, rotating it is mandatory; deleting the commit is not sufficient, because history is permanent.
+
+**2. Anything coursework-derived.** Source, headers, `.y` and `.l` files, build scripts, test harnesses, tarballs, core dumps. Covered by D3, D11, D21.
+
+**3. Personal contact data in published artifacts.** The résumé LaTeX sources carry a phone number and a personal email. Compiling one of them in public CI publishes both the source and a PDF containing them, permanently and machine-readably, to a site that scrapers visit.
+- Maintain a **web variant** of the résumé with the phone number removed and the contact line reduced to `vitor@vrovaris.com` plus the links. That variant is what CI compiles and what `/resume.pdf` serves.
+- The full version with the phone number stays local or in a private repo and is what Vitor sends directly to recruiters.
+- Only the one variant being built belongs in the repo. The other four stay out.
+- `profile.json` already excludes the phone number. This closes the same gap for the PDF.
+
+**4. Identifying strings inside published artifacts.** Two specific ones, both easy to miss because the file is "just output":
+- **`strace` traces** for the gate contain absolute paths. A raw trace exposes a home directory and username. The capture harness normalises addresses and pids already; it must also normalise home paths and usernames, and the check belongs in CI next to the `strings` check.
+- **Screenshots and terminal recordings** of the shell show a prompt, which typically contains a username and the department server's hostname — exactly what D28 keeps out of committed documents. Scrub the prompt to something neutral before publishing any recording, or record against a local build.
+
+**Also worth avoiding, for hygiene rather than safety:** committing the shell binary itself. Git history is permanent and a binary that gets rebuilt grows the repository forever. Publish it as a release asset or through the container registry (D22) and have the site link to it, rather than checking it in.
+
+
+---
+
+## 2026-09-11 — Repository visibility and document layout
+
+**D32 — `personal-website` stays private until the site launches, and every agent-facing document except `AGENTS.md` and `CLAUDE.md` moves under `docs/`.** *(decided by: Vitor · active)*
+Reasoning: today the repository is entirely planning and no site. A visitor would see a long plan for something that does not exist, which reads as a person who plans more than they build — a fair inference while it is true. The plan also spells out every easter egg and the whole design concept, which is worth encountering rather than reading about. Neither problem is about the AI-tooling files themselves: `AGENTS.md` is an ordinary convention, and the practice documents are engineering standards that would serve a human contributor with no agent involved.
+Rejected: deleting or hiding the documents. The decision log in particular is the strongest artifact in the repository and should be public eventually.
+Consequences:
+1. `personal-website` is **private** during the build and flips public at launch, when the ratio inverts and the log reads as a record of how the site was built rather than a promise about what it might be.
+2. Root holds only `README.md`, `AGENTS.md`, and `CLAUDE.md`. Everything else agent-facing lives under `docs/`. `AGENTS.md` and `CLAUDE.md` stay at the root because that is where the tools look for them.
+3. `portfolio-site-plan.md` is renamed `docs/plan.md`.
+4. `docs/practices/` is unchanged, so the skill symlinks still resolve.
+5. **A real `README.md` is written before the repository goes public** — three paragraphs on what the site is and a link to it. The first file a visitor opens should not be a plan.
+6. Use `git mv` for the move so history follows the files.
+
+
+---
+
+## 2026-09-11 — What gets tracked inside `.claude/`
+
+**D33 — The symlinks are committed; machine-local assistant state is not.** *(decided by: Vitor, with a recommendation · active)*
+Reasoning: a symlink is a fifteen-byte blob holding a path, so tracking costs nothing, and it is what makes a fresh clone work without a setup step. Leaving them untracked means `setup-practices.sh` has to be re-run on every machine and after every clone — precisely the manual step that gets forgotten when switching machines or providers, which would undercut D19.
+Consequences:
+- **Tracked:** `CLAUDE.md` and `.claude/skills/<name>/SKILL.md`. These are configuration, not build output.
+- **Ignored:** `.claude/settings.local.json` and any other machine-local assistant state.
+- Verify with `git ls-files -s`; mode `120000` is a symlink. Mode `100644` means something materialized them as regular files whose contents are a path string, which would silently break both the skills and `CLAUDE.md`.
+- `setup-practices.sh` is idempotent and only needs re-running if a link is missing or broken.

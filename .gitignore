@@ -24,6 +24,12 @@ dist/
 npm-debug.log*
 pnpm-debug.log*
 
+# ---- assistant state (D33) ----
+# .claude/skills/ and CLAUDE.md ARE tracked on purpose — they are symlinks
+# into docs/practices/, and tracking them is what makes a fresh clone work.
+.claude/settings.local.json
+.claude/*.local.json
+
 # ---- editors ----
 .vscode/*
 !.vscode/extensions.json
@@ -35,6 +41,16 @@ pnpm-debug.log*
 ._*
 .Spotlight-V100
 .Trashes
+
+# ---- personal data (D31) ----
+# Only the web résumé variant belongs here, and it carries no phone number.
+resume_general_swe_with_shell.tex
+resume_systems_infra.tex
+resume_product_management.tex
+resume_research.tex
+*.aux
+*.log
+*.synctex.gz
 
 # ---- guard rail (D21): coursework must never reach this repo ----
 # These patterns are here so an accidental copy is silently ignored rather than

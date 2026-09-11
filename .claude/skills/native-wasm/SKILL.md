@@ -1,0 +1,1 @@
+../../../docs/practices/native-wasm.md

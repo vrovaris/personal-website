@@ -3,8 +3,8 @@
 A delegable plan for a personal site for **Vitor Augusto Hertel Rovaris**. Written so each phase can be handed to a separate agent or session with no extra context.
 
 - **Status:** v2.2. Phase 0 resolved; instructor ruling recorded (D11–D13); compiled artifacts permitted (D17); documentation made provider-portable (D19). One item still open (§12).
-- **Read `AGENTS.md` and `DECISIONS.md` before this file.** The decision log outranks this plan; where they disagree, patch the plan.
-- **Companion files:** `AGENTS.md` (how to work here, any provider), `DECISIONS.md` (append-only decision log), `OPEN_QUESTIONS.md` (unresolved).
+- **Read `AGENTS.md` and `docs/DECISIONS.md` before this file.** The decision log outranks this plan; where they disagree, patch the plan.
+- **Companion files:** `AGENTS.md` at the repo root (how to work here, any provider), `docs/DECISIONS.md` (append-only decision log), `docs/OPEN_QUESTIONS.md` (unresolved), `docs/practices/*.md` (how to do the work). This file lives at `docs/plan.md`.
 - **Sources:** the five résumé variants and LaTeX sources. Two peer portfolio sites were read directly as references; they are described by pattern rather than named, per D28.
 
 **Changes from v1:** concept A confirmed; the citizenship framing is removed entirely (D2); the shell interactive is rebuilt clean-room because the coursework cannot be published (D3, D11); Phases 3 and 4 swap order so the public repo leads; i18n and dark mode are deferred but pre-wired (D5); domain, budget, and résumé variant fixed (D4, D8, D10).
@@ -25,9 +25,9 @@ A delegable plan for a personal site for **Vitor Augusto Hertel Rovaris**. Writt
 
 - **Never mention citizenship, passports, visas, or immigration status.** Not in copy, not in metadata, not in an easter egg, not in a joke. This is a hard constraint (D2). Brazilian origin, Portuguese as a first language, and living in Indiana are fine; legal status is not.
 - **Never publish CS 252 coursework source**, excerpts, identifiers, file names, or error strings (D3, D11). This is permanent. **Compiled binaries, screenshots, and recorded sessions are permitted** under D17, subject to the release checks in §7.3. Private repo links stay off.
-- **Append every decision to `DECISIONS.md` before ending a session** (D19). A session that closed an option and recorded nothing has lost work. Cite decision IDs in pull requests.
-- **Do not invent facts.** Every number, date, title, and claim comes from `src/data/profile.json` (§8). If a fact is missing, stop and append the question to `OPEN_QUESTIONS.md`.
-- **Do not add features that aren't in this plan.** Propose them in `OPEN_QUESTIONS.md`.
+- **Append every decision to `docs/DECISIONS.md` before ending a session** (D19). A session that closed an option and recorded nothing has lost work. Cite decision IDs in pull requests.
+- **Do not invent facts.** Every number, date, title, and claim comes from `src/data/profile.json` (§8). If a fact is missing, stop and append the question to `docs/OPEN_QUESTIONS.md`.
+- **Do not add features that aren't in this plan.** Propose them in `docs/OPEN_QUESTIONS.md`.
 - **No component library, no Tailwind, no template.** Plain CSS with custom properties.
 - **No paid dependencies.** Budget is $20/year total and the domain consumes it (D8).
 - Accessibility floor in §10 is non-negotiable, including on the interactive pieces.
@@ -342,8 +342,15 @@ vrovaris.com/
 │  └─ resume.pdf                 # CI artifact
 ├─ workers/{curl-resume,guestbook}/
 ├─ tools/{capture-traces,tex-to-ansi}/
-├─ DECISIONS.md
-└─ OPEN_QUESTIONS.md
+├─ docs/
+│  ├─ plan.md                  (this file)
+│  ├─ DECISIONS.md
+│  ├─ OPEN_QUESTIONS.md
+│  └─ practices/*.md
+├─ .claude/skills/<name>/SKILL.md   (symlinks into docs/practices/)
+├─ AGENTS.md
+├─ CLAUDE.md -> AGENTS.md
+└─ README.md
 ```
 
 **Four repositories, deliberately separate (D21).** The coursework lives alone in a private repo so it cannot reach the site's git history through a mis-scoped `git add` or an agent working in the site directory.
@@ -528,6 +535,13 @@ Phases 1 and 2, plus **Phase 3**, plus P5-03. Roughly 40–50 hours, or three fo
 - `prefers-reduced-motion` respected. Interactive results announced, not only drawn.
 - Every page usable and comprehensible with JS off.
 
+**Process (D29)**
+- The plan was posted and approved before code was written.
+- The PR contains the walkthrough: what changed, how it works, why this way, what to read closely, what you would challenge.
+- New code is under roughly 300 lines, or the ticket was split.
+- No refactor mixed into a feature PR, no drive-by fixes.
+- The diff was re-read for deletable lines, and the PR says what came out.
+
 **Correctness and constraints**
 - No fact absent from `profile.json`.
 - Any simulation labeled as one, in the UI, in one plain sentence.
@@ -547,7 +561,7 @@ Phases 1 and 2, plus **Phase 3**, plus P5-03. Roughly 40–50 hours, or three fo
 | Coursework persists somewhere it shouldn't (project files, memory, a shared repo) | Medium | High | §5.2a storage rules: non-retained session, never attached to a project with memory, verify the setting rather than assuming it. |
 | A published binary leaks coursework identifiers via symbols or strings | Medium | High | D17 release checks, automated in CI as a blocking step, not run by hand. |
 | D17 rests on an interpretation the instructor never confirmed | Medium | Medium | Send the two-line follow-up email. Costs nothing, converts an interpretation into a record. Until then the binary is a judgement call, not a permission. |
-| Decisions lost when switching providers | Medium | High | D19: `AGENTS.md` plus an append-only `DECISIONS.md`. Nothing important lives in a chat log or model memory. |
+| Decisions lost when switching providers | Medium | High | D19: `AGENTS.md` plus an append-only `docs/DECISIONS.md`. Nothing important lives in a chat log or model memory. |
 | New parser resembles the CS 252 starter grammar | Medium | **Severe** | D12: hand-written recursive descent, derived from the POSIX spec, built without opening the coursework. If a rule feels familiar, rewrite it. |
 | libseccomp WASM spike fails | Medium | Low | Timeboxed, TS fallback planned. |
 | Grammar repo grows into a second shell project | Medium | Medium | Fixed feature list in P4-01. Anything beyond it is a separate project. |
@@ -574,7 +588,7 @@ Only two things block work, and only on specific tickets.
 
 **Q4 — Optional, recommended:** send the instructor a two-line follow-up confirming that a compiled binary with no source is acceptable. He was asked and did not answer that specific point. Nothing blocks on it, but it converts D17 from an interpretation into a record.
 
-Everything else in §12 of v1 is now recorded in `DECISIONS.md`.
+Everything else in §12 of v1 is now recorded in `docs/DECISIONS.md`.
 
 ---
 
@@ -590,9 +604,9 @@ Ten minutes each before Phase 2: **lynnandtonic.com** (redesigns around one visu
 
 ## Appendix B — Starter prompt for a delegated agent
 
-> You are building `vrovaris.com`. Read `portfolio-site-plan.md` in full, then `DECISIONS.md`, then `src/data/profile.json`, before writing any code. Implement only ticket **[ID]**.
+> You are building `vrovaris.com`. Read `AGENTS.md`, then `docs/DECISIONS.md`, then `docs/plan.md`, then `src/data/profile.json`, before writing any code. Implement only ticket **[ID]**.
 >
-> Hard constraints: never reference citizenship, passports, visas, or immigration status anywhere (D2). Never publish anything derived from the CS 252 coursework — no source, no compiled artifact, no screenshots, no recorded sessions (D3, D11); prose descriptions only. Do not invent any biographical fact — if you need one that is not in `profile.json`, stop and append the question to `OPEN_QUESTIONS.md`. No dependencies outside §6, no Tailwind, no component library, no paid assets.
+> Hard constraints: never reference citizenship, passports, visas, or immigration status anywhere (D2). Never publish anything derived from the CS 252 coursework — no source, no compiled artifact, no screenshots, no recorded sessions (D3, D11); prose descriptions only. Do not invent any biographical fact — if you need one that is not in `profile.json`, stop and append the question to `docs/OPEN_QUESTIONS.md`. No dependencies outside §6, no Tailwind, no component library, no paid assets.
 >
 > Before opening a PR, verify every item in §10 that applies to your ticket and paste the checklist into the PR description.
 
