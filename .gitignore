@@ -1,0 +1,52 @@
+# ---- dependencies ----
+node_modules/
+.pnpm-store/
+
+# ---- build output ----
+dist/
+.astro/
+.output/
+.wrangler/
+
+# NOTE: public/wasm/*.wasm and public/traces/*.json ARE committed on purpose.
+# They are build artifacts checked in deliberately (plan §6). Do not ignore them.
+
+# ---- secrets ----
+.env
+.env.*
+!.env.example
+.dev.vars
+*.pem
+*.key
+
+# ---- logs ----
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ---- editors ----
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# ---- macOS ----
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# ---- guard rail (D21): coursework must never reach this repo ----
+# These patterns are here so an accidental copy is silently ignored rather than
+# committed. Git history is permanent; a wrong commit here cannot be undone by a
+# revert. If one of these ever matches something you actually wanted, you are in
+# the wrong directory.
+cs252/
+shell-private/
+private-shell/
+shell/
+*.y
+*.l
+*.tar.gz
+core
+core.*
