@@ -26,3 +26,21 @@ Anything an agent could not resolve, and anything waiting on Vitor. Append; do n
 ## Raised by agents during work
 
 *(append below — include the ticket ID you were on)*
+
+**Q6 — Where does the résumé source live, and what is it called?** *(raised during P1-01; blocks nothing until P1-07)*
+`resume_web.tex` sits untracked at the repository root. Two conflicts: D32 says the root holds only `README.md`, `AGENTS.md`, and `CLAUDE.md`, and D10 names the CI input `resume_general_swe.tex`, not `resume_web.tex`. The file's contents are correct — no phone number, `vitor@vrovaris.com` as the only contact — so D31 point 3 is satisfied and this is purely about name and location. Plan §6's repository layout shows `public/resume.pdf` as a CI artifact but gives the `.tex` source no home. Suggest `resume/` or `tools/resume/`, and either renaming the file or amending D10 to match.
+
+**Q7 — Font licences are not in the repository.** *(raised during P1-01; actionable in P1-02)*
+Both self-hosted faces ship without a licence file. Newsreader is OFL, which requires the licence to travel with the font. Commit Mono's current terms need confirming — plan §4.2 already flags "confirm current license at download". Suggest `public/fonts/OFL.txt` plus whatever Commit Mono requires, referenced from `/colophon` when P2-06 is built.
+
+**Q8 — React is installed with no island to hydrate.** *(raised during P1-01)*
+P1-01 lists React islands as scaffold scope, so `@astrojs/react` is installed. The build emits a 220KB React bundle into `dist/client/_astro/` that no page references — verified: the built page contains no `<script>` tag at all, so visitors download none of it and the ≤100KB JS budget is untouched. It is dead weight in the deployed output until the first island lands in Phase 3. Leave it, or drop the integration until the gate needs it and reinstall then?
+
+**Q9 — No ticket sets up the test tooling that §10 requires.** *(raised during P1-01)*
+Plan §10 requires axe-core clean on every route in CI, and §6 names Playwright, axe-core, and Lighthouse CI in the stack. No Phase 1 ticket installs any of them, and the CI workflow added in P1-01 only builds and type-checks. Either a Phase 1 ticket is missing, or the tooling belongs with the first route that has real content in Phase 2. Flagging so the §10 checklist does not silently go unenforced until someone notices at launch.
+
+**Q10 — `noindex` must come out at launch.** *(raised during P1-01)*
+`src/pages/index.astro` carries `<meta name="robots" content="noindex">` so the placeholder and the preview deploys stay out of search results while the repository is private (D32). It is correct now and wrong the moment the site launches. Whoever flips the repo public removes this line in the same pull request. Cloudflare Access protection on preview URLs was not available when P1-01 was set up, so this meta tag is currently the only thing keeping unfinished deploys out of search results.
+
+**Q11 — Enable Cloudflare Access on preview deploys before Phase 2 starts.** *(raised during P1-01; Vitor asked to be reminded)*
+Access protection was not available when the Worker was set up, so preview URLs are public to anyone holding one. Today that exposes a single line of placeholder text, which is why P1-01 shipped without it. Phase 2 is when previews start carrying real content — the writing, the work entries, the photography — and D32 keeps the repository private for exactly that reason. The blocker is usually a prerequisite rather than the Worker setting: Cloudflare Dashboard → Zero Trust → complete the one-time team-domain setup, free for up to 50 users so D8 is unaffected, after which the Access toggle becomes available. Do this before the first P2 ticket, not during it.

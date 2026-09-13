@@ -1,0 +1,195 @@
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.32in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-2pt}]
+\titlespacing*{\section}{0pt}{8pt}{10pt}
+
+% Ensure that generated pdf is machine readable / ATS parsable
+\pdfgentounicode=1
+
+%-------------------------
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubSubheading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}, topsep=2pt]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+\newcommand{\resumeSubSubheadingAlt}[2]{
+    \vspace{1pt}
+    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+      \textit{\small#1} & \textit{\small #2} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+% Tighten list spacing so each variant fits on a single page
+\setlist[itemize]{topsep=8pt, partopsep=0pt, parsep=0pt, itemsep=5pt}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge \scshape Vitor Augusto Hertel Rovaris} \\
+    \href{mailto:vitor@vrovaris.com}{\underline{vitor@vrovaris.com}} $|$
+    \href{https://linkedin.com/in/vrovaris/}{\underline{linkedin.com/in/vrovaris}} $|$
+    \href{https://github.com/vrovaris/}{\underline{github.com/vrovaris}}
+\end{center}
+%-----------EDUCATION-----------
+\section{Education}
+  \resumeSubHeadingListStart
+    \resumeSubheading
+      {Purdue University}{West Lafayette, IN}
+      {B.S. in Computer Science, Concentration in Systems Software and Security}{Aug. 2024 -- May 2028}
+    \vspace{6pt}
+    \resumeItem{\textbf{GPA:} 3.84/4.0}
+    \resumeItem{\textbf{Relevant Coursework:} Data Structures \& Algorithms, Operating Systems, Systems Programming, Computer Security.}
+  \resumeSubHeadingListEnd
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \resumeSubHeadingListStart
+
+% PURDUE
+    \resumeSubheading
+      {Purdue University}{West Lafayette, IN}
+      {Undergraduate Research Assistant --- AutoIC Lab}{Aug. 2026 -- Present}
+      \resumeItemListStart
+        \resumeItem{Awarded a Purdue Office of Undergraduate Research Scholarship for the 2026--2027 academic year to research AI, natural language processing, and Building Information Modeling applied to construction automation, in a lab funded by the National Science Foundation.}
+      \resumeItemListEnd
+
+      \resumeSubSubheadingAlt{Undergraduate Teaching Assistant --- CS 18000}{Aug. 2026 -- Present}
+      \resumeItemListStart
+        \resumeItem{Lead weekly lab sections of 25 students, hold office hours, and proctor exams for CS 18000: Problem Solving and Object-Oriented Programming, Purdue's introductory computer science course taken by 761 students this term, coaching students through algorithm design, debugging, and object-oriented design in Java.}
+      \resumeItemListEnd
+
+% BTG PACTUAL
+    \resumeSubheading
+      {BTG Pactual}{S\~{a}o Paulo, Brazil}
+      {Software Engineering Intern --- Energy Desk}{June 2026 -- Aug. 2026}
+      \resumeItemListStart
+        \resumeItem{Built an event-driven integration between the Energy Desk's backend and the bank's core finance system using Python, RabbitMQ, and Celery, deployed on Kubernetes with PostgreSQL.}
+        \resumeItem{Automated tracking of debit notes across 3 internal systems, processing 371 notes/month representing over \$140M in monthly financial flows, with individual notes ranging from \$0.01 to \$236M.}
+        \resumeItem{Closed a \$50M discrepancy between the bank's managerial and accounting reports; delivered the system into UAT for business validation ahead of production rollout.}
+      \resumeItemListEnd
+
+      \resumeSubSubheadingAlt{Software Engineering Intern}{June 2025 -- Aug. 2025}
+      \resumeItemListStart
+        \resumeItem{Designed a serverless AI pipeline (AWS Lambda, SQS) for automated contract verification, processing 20,000+ signatures in hours; presented 80\% efficiency gains to executives, driving enterprise-wide AI adoption.}
+      \resumeItemListEnd
+
+% BRASA
+    \resumeSubheading
+      {BRASA -- Brazilian Student Association}{Remote}
+      {Technology Director}{Sept. 2025 -- Aug. 2026}
+      \resumeItemListStart
+        \resumeItem{Defined and executed the 2025--2026 technical roadmap across web, mobile, and data platforms serving 20,000+ members; managed 13 people across Product \& UX, Software Engineering, and Data teams.}
+        \resumeItem{Led architecture reviews and set technical standards across multiple products; structured the migration of 12 years of legacy data into the platform's unified PostgreSQL database.}
+      \resumeItemListEnd
+
+      \resumeSubSubheadingAlt{Software Engineering Manager}{May 2025 -- Sept. 2025}
+      \resumeItemListStart
+        \resumeItem{Managed 4 software engineers; established a structured development lifecycle with design reviews, documentation standards, and security checks, raising Net Promoter Score by 120+ points.}
+      \resumeItemListEnd
+
+      \resumeSubSubheadingAlt{Software Engineering Analyst}{Oct. 2024 -- May 2025}
+      \resumeItemListStart
+        \resumeItem{Built a React/Node.js portal with PostgreSQL, REST APIs, and role-based authentication; engineered a React Native app reaching 90\%+ adoption across the 20,000+ member network.}
+      \resumeItemListEnd
+
+  \resumeSubHeadingListEnd
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \resumeSubHeadingListStart
+      \resumeProjectHeading
+          {\textbf{Medical Shift Scheduling Platform} $|$ \emph{Next.js, TypeScript, Supabase, Python, OR-Tools}}{\textit{June 2026 -- Present}}
+          \resumeItemListStart
+            \resumeItem{Developing a full-stack scheduling platform (Next.js, TypeScript, Supabase/PostgreSQL) that assigns a 25-doctor anesthesiology group to operating rooms and on-call shifts, backed by a Python/FastAPI microservice using Google OR-Tools CP-SAT to encode rest rules and room workloads.}
+          \resumeItemListEnd
+
+      \resumeProjectHeading
+          {\textbf{Hermes --- Secure Linux Sandbox} $|$ \emph{C, Seccomp-BPF, cgroups v2, FastAPI}}{\textit{Apr. 2026 -- Present}}
+          \resumeItemListStart
+            \resumeItem{Building a code execution engine in C that runs untrusted binaries in isolated PID, network, and mount namespaces with a chroot jail, seccomp-BPF syscall whitelisting, and cgroups v2 memory caps; exposed through a FastAPI service and validated against 7 attack scenarios.}
+          \resumeItemListEnd
+    \resumeSubHeadingListEnd
+
+%-----------PROGRAMMING SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}, topsep=2pt]
+    \small{\item{
+     \textbf{Languages:} Python, C/C++, Java, TypeScript, SQL, Assembly (ARM, x86) \\
+     \textbf{Web \& Backend:} React, React Native, Next.js, Node.js, Django REST Framework \\
+     \textbf{Cloud \& Infrastructure:} AWS (Lambda, SQS, EC2), Kubernetes, Docker, RabbitMQ, Celery, PostgreSQL, Linux/UNIX, Git
+    }}
+ \end{itemize}
+%-------------------------------------------
+\end{document}
