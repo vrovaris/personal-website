@@ -68,7 +68,7 @@ Consequences: …
 | D32 | Repo private until launch; docs under `docs/` | active |
 | D33 | Symlinks are tracked; machine-local Claude state is not | active |
 | D34 | Font budget raised to 150KB; both Newsreader axes kept | active, amends plan §10 and P1-02 |
-| D35 | Astro 7 rather than Astro 5; adapter and wrangler follow | active, amends plan §6 and P1-01 |
+| D35 | Astro 7 rather than Astro 5; adapter and wrangler follow | active; collections item closed by D46 |
 | D36 | State colours revalued per ground, scoped by selector | colours superseded by D41; scoping mechanism active |
 | D37 | Commit Mono is MIT; licences ship; masters stay untracked | active, answers Q7 |
 | D38 | User-ground trapped and quiet revised for mutual distinguishability | superseded by D40, then D41 |
@@ -79,8 +79,9 @@ Consequences: …
 | D43 | 68ch means 68 characters, not the CSS ch unit | active, clarifies plan §4.2 and §4.3 |
 | D44 | Kernel blocks are ink at every width, not just mobile | active, amends plan §4.3 |
 | D45 | Rule sits flush at the kernel edge, not mid-gutter | active, refines D44 |
+| D46 | Locale in the directory; getLocalised is the only accessor | active, implements P1-04 |
 
-**Next free ID: D46.**
+**Next free ID: D47.**
 
 ---
 
@@ -566,3 +567,14 @@ Reasoning: once kernel blocks became ink (D44), the 1px rule sat 16px away from 
 The rule earns its place in the gaps, not beside the blocks. Where a kernel block exists, the block edge already divides the tracks. Where none exists — a page with no kernel content, or a long run of prose between annotations — the rule is the only thing marking that there are two territories, and D1 makes that boundary the site's identity. Deleting it would leave "prose with dark blocks to the left of it", which is a common pattern and not this one.
 Rejected: removing the rule and letting the blocks imply the boundary by sharing a right edge. Cheaper, and wrong on exactly the pages with sparse kernel content. Also rejected: dropping the blocks and returning to type-only kernel space, which is what D44 was raised to fix.
 Consequences: `background-position` moves from `--pad + --measure-kernel + --gutter / 2` to `--pad + --measure-kernel`. Blocks now press flush against the rule and read as one boundary; the full 32px gutter falls between the rule and the prose. The rule stays continuous and full-height, so §4.3's headline feature is unchanged in behaviour, only in placement.
+
+**D46 — Locale lives in the directory, not in the schema, and `getLocalised()` is the only sanctioned way to list entries.** *(2026-09-13 · decided by: recommendation, approved by Vitor · active · implements P1-04, closes the collections half of D35)*
+Reasoning: P1-04's acceptance criteria are that adding a `pt/` file later needs no schema change and that no dead `/pt/` routes ship. A `locale` field in frontmatter satisfies neither cleanly — it is part of the schema by definition, every author has to set it, and it can disagree with the directory the file sits in. Folding the locale into the entry id removes the possibility: `src/content/work/en/x.mdx` loads as `en/x`, and the schema never mentions locale at all.
+Verified rather than assumed, with a temporary probe that was deleted afterwards: with both `en/probe` and `pt/probe` present, `getCollection('work')` returned both and `getLocalised('work')` returned only the `en` entry. A missing required field failed the build and named the field.
+Consequences:
+1. `glob({ pattern: '**/*.mdx', base: './src/content/<name>' })` for all four collections, so the locale directory becomes the id prefix.
+2. **Routes list entries through `getLocalised()` in `src/content.ts`, never `getCollection` directly.** That helper is what keeps a stray `pt/` file from rendering; calling `getCollection` in a route is the way this rule gets broken.
+3. Schema fields come from plan §7 and nothing more — no `draft` or `order` until a Phase 2 page needs one.
+4. `things.repo` is optional and must stay absent for the shell entry: no repository link, ever (D3, D26).
+5. **Astro 7 API specifics**, none of which match the plan's wording: the config is `src/content.config.ts`, loaders come from `astro/loaders`, `z` from `astro:content` is deprecated in favour of `astro/zod`, and `z.string().url()` is deprecated in favour of `z.url()`. Using the plan's assumed API produces eight deprecation warnings.
+6. Empty collections emit one `glob-loader` warning each until Phase 2 adds content. Warnings, not errors; they disappear as entries land.
