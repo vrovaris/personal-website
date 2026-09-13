@@ -67,8 +67,10 @@ Consequences: …
 | D31 | What never enters the public repository | active |
 | D32 | Repo private until launch; docs under `docs/` | active |
 | D33 | Symlinks are tracked; machine-local Claude state is not | active |
+| D34 | Font budget raised to 150KB; both Newsreader axes kept | active, amends plan §10 and P1-02 |
+| D35 | Astro 7 rather than Astro 5; adapter and wrangler follow | active, amends plan §6 and P1-01 |
 
-**Next free ID: D34.**
+**Next free ID: D36.**
 
 ---
 
@@ -368,3 +370,58 @@ Consequences:
 - **Ignored:** `.claude/settings.local.json` and any other machine-local assistant state.
 - Verify with `git ls-files -s`; mode `120000` is a symlink. Mode `100644` means something materialized them as regular files whose contents are a path string, which would silently break both the skills and `CLAUDE.md`.
 - `setup-practices.sh` is idempotent and only needs re-running if a link is missing or broken.
+
+
+---
+
+## 2026-09-11 — The font budget
+
+**D34 — The ≤40KB font budget is raised to ≤150KB; Newsreader ships with both axes intact, subset to Latin-1.** *(2026-09-11 · decided by: Vitor · active · amends plan §10, the P1-02 acceptance criteria, and `practices/frontend.md`)*
+
+Reasoning: the budget and the design contradicted each other and the contradiction only surfaced when the real files were measured. Plan §4.2 requires optical sizing on, and §10 capped all fonts at 40KB. Measured on the delivered files — Newsreader variable at 195.3KB (`wght` 200–800, `opsz` 6–72) and Commit Mono static at 36.1KB — no configuration satisfies both. A second variable axis roughly doubles the `gvar` table, so `opsz` costs about 27KB that no amount of glyph subsetting recovers. Vitor's ruling: the byte cap goes, the optical sizing stays.
+
+Measured options, Newsreader + Commit Mono, both subset to Latin-1:
+
+| Configuration | Total | Verdict |
+|---|---|---|
+| As delivered, no subsetting | 231.4KB | Rejected: 95KB of it is coverage the site will never render |
+| Both axes kept, Latin-1 | **136.1KB** | **Chosen** |
+| `opsz` pinned 18, `wght` 400–700 | 30.4KB | Rejected: met the old cap by deleting optical sizing |
+| Fully static, `wght` 400 only | 33.7KB | Rejected: headings get synthetic bold, which is a visible tell |
+
+Rejected: pinning `opsz` to stay under 40KB, which is what the old cap forced. Newsreader's `opsz` range is 6–72 and the scale in §4.2 tops out at 4.25rem (68px), where a display optical cut is doing real work on a serif — finer hairlines, tighter spacing. Paying 27KB to keep the concept's primary typeface behaving correctly at display sizes is the right trade once the cap is not treated as sacred. Also rejected: shipping the files unsubsetted, since dropping unused scripts costs one local command and no dependency.
+
+Consequences:
+1. **The font line in plan §10 and in `practices/frontend.md` now reads ≤150KB.** The other three numbers on that line — 100KB JS, 60KB CSS, 300KB images — are unchanged.
+2. **P1-02's acceptance criterion changes from `fonts ≤40KB total` to `fonts ≤150KB total`.** Every other criterion on that ticket stands, including `size-adjust` for FOUT.
+3. **Newsreader keeps `wght` 200–800 and `opsz` 6–72.** `font-optical-sizing: auto` is the default and is left on; §4.2 is now honoured rather than quietly broken.
+4. **Subsetting is to Latin-1 plus general punctuation**, which covers Portuguese in full and so does not foreclose D5's deferred locale. The subset is produced once with `fonttools` on a local machine and the outputs are committed; no build-time font dependency enters the repo, and no font is downloaded — the source files were supplied by Vitor.
+5. **Provenance is committed next to the fonts**: the source filenames, their version strings, and the exact subsetting command, because the unsubsetted originals do not live in this repository.
+6. **The real enforcement moves to the LCP and CLS targets in §10, which are unchanged.** Fonts load with `font-display: swap` behind `size-adjust`-matched fallbacks, so they do not block first paint. If LCP on simulated 4G regresses past 1.5s, the fix is the font stack, not a further budget amendment.
+7. **150KB has roughly 14KB of headroom and no room for an italic.** A Newsreader italic is a second variable file of comparable weight; adding one needs a new entry here, not a quiet edit to the number.
+
+
+---
+
+## 2026-09-11 — Framework major
+
+**D35 — The site is built on Astro 7, not Astro 5.** *(2026-09-11 · decided by: Vitor · active · amends plan §6, P1-01, and `practices/frontend.md`)*
+
+Reasoning: the plan named Astro 5 when 5 was current. A clean install in September 2026 resolves 7.3.2, and the Cloudflare adapter pins the choice — each adapter major supports exactly one Astro major, so the framework version and the adapter version are one decision, not two.
+
+| `@astrojs/cloudflare` | requires |
+|---|---|
+| 12.6.13 | `astro ^5.7.0` |
+| 13.7.0 | `astro ^6.3.0`, `wrangler ^4.83.0` |
+| **14.3.1** | **`astro ^7.2.0`, `wrangler ^4.125.0`** |
+
+Rejected: pinning to Astro 5 with adapter 12. It is coherent and available, but it starts a site two majors behind on a runtime that has moved twice since, and the migration debt would come due during Phase 3 or 4 rather than on day one when the repository is empty.
+
+Consequences:
+1. **Installed:** `astro 7.3.2`, `@astrojs/cloudflare 14.3.1`, `@astrojs/react 6.0.5`, `react`/`react-dom` 19.3.0. `wrangler 4.131.0` enters as a devDependency to satisfy the adapter's peer requirement — the first dependency in the project the plan did not name.
+2. **TypeScript is pinned to `^6`, not `^7`.** `@astrojs/check` accepts `^5 || ^6`; TypeScript 7 installs by default and breaks it. Unpin when `@astrojs/check` supports 7.
+3. **P1-04 must verify the content collection API against Astro 7 rather than assume the plan's wording.** Collections changed across these majors. This is the only ticket the version move actually touches, and the risk is deferred there, not resolved here.
+4. **The adapter nests the build output at `dist/client/`, not `dist/`.** Cloudflare Pages must be configured with that output directory or it deploys nothing.
+5. **The adapter generates a `wrangler.json` declaring a `SESSION` KV binding and an `IMAGES` binding.** Neither exists in the account and neither is used while every route is static. If the first deploy fails on a missing binding, this is why.
+6. **`esbuild` and `workerd` need their install scripts approved**, recorded in `pnpm-workspace.yaml` so a fresh clone and CI do not hit the same prompt. `workerd` is Cloudflare's runtime and local preview does not work without it.
+7. **Node is pinned to >=22.12.0**, Astro 7's floor, in `package.json` and in CI. Cloudflare Pages needs `NODE_VERSION` set to match.

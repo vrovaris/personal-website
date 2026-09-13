@@ -1,0 +1,5 @@
+# esbuild and workerd ship native binaries that their install scripts fetch.
+# workerd is Cloudflare's runtime; the adapter cannot preview locally without it.
+allowBuilds:
+  esbuild: true
+  workerd: true

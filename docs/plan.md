@@ -297,7 +297,7 @@ No Konami code.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Framework | **Astro 5** + islands | Zero JS by default; heavy WASM loads only where needed. Also not Next.js, which both reference sites use. |
+| Framework | **Astro 7** + islands (D35) | Zero JS by default; heavy WASM loads only where needed. Also not Next.js, which both reference sites use. |
 | Islands | React 19, inside islands only | The gate and the grammar need state. Nothing else does. |
 | Styling | Plain CSS + custom properties, one `tokens.css` | The design dies if it inherits a utility framework's defaults. |
 | Content | Astro content collections, MDX | Type-checked frontmatter, locale-ready. |
@@ -437,11 +437,11 @@ Estimates are focused hours for one competent agent or one focused Vitor session
 
 ### Phase 1 — Foundation — 10–14h
 
-**P1-01 — Scaffold.** Astro 5, TS strict, React islands, Cloudflare Pages adapter. Deploy a blank page to production on day one so deployment is never a late surprise.
+**P1-01 — Scaffold.** Astro 7 (D35), TS strict, React islands, Cloudflare Pages adapter. Deploy a blank page to production on day one so deployment is never a late surprise.
 *AC:* `main` auto-deploys; PR previews work; clean build.
 
 **P1-02 — Tokens and type.** §4.1 and §4.2 as `tokens.css`, semantic names only outside the palette block. Wire `data-theme` and the `prefers-color-scheme` listener but ship light only. Self-host Commit Mono, subset Newsreader. Build a `/styleguide` route, excluded from the sitemap.
-*AC:* zero raw hex outside the palette block; no component references `--plaster` or `--ink` directly; fonts ≤40KB total; FOUT handled with `size-adjust`.
+*AC:* zero raw hex outside the palette block; no component references `--plaster` or `--ink` directly; fonts ≤150KB total (D34); FOUT handled with `size-adjust`.
 
 **P1-03 — The boundary layout.** §4.3 as a layout component plus the mobile stack. Highest-risk CSS in the project; do it before content.
 *AC:* correct at 320/768/960/1440; the rule is continuous and does not break across sections; tab order follows prose order, not visual order.
@@ -524,7 +524,7 @@ Phases 1 and 2, plus **Phase 3**, plus P5-03. Roughly 40–50 hours, or three fo
 ## 10. Definition of done
 
 **Performance**
-- Initial route ≤100KB JS, ≤40KB fonts, ≤60KB CSS, ≤300KB images. Islands excluded but each lazy-loads behind viewport or click.
+- Initial route ≤100KB JS, ≤150KB fonts (D34), ≤60KB CSS, ≤300KB images. Islands excluded but each lazy-loads behind viewport or click.
 - LCP <1.5s on simulated 4G; CLS <0.02; INP <200ms.
 - Anything over 1MB sits behind an explicit click with the byte count on the button.
 

@@ -9,7 +9,7 @@ Read `simplicity.md` first. Everything below is subordinate to it.
 
 ## Stack rules
 
-- **Astro 5**, zero JS by default. A React island is justified only when a component holds state that changes after load. Three islands are planned: the gate, the grammar, the guestbook. A fourth needs an argument.
+- **Astro 7** (D35), zero JS by default. A React island is justified only when a component holds state that changes after load. Three islands are planned: the gate, the grammar, the guestbook. A fourth needs an argument.
 - **Plain CSS with custom properties.** No Tailwind, no CSS-in-JS, no component library, no UI kit. The site's identity dies the moment it inherits a framework's defaults, and that is the entire point of building it by hand.
 - **One `tokens.css`.** Raw hex values appear there and nowhere else.
 - Islands are lazy-loaded behind viewport or click, never eagerly hydrated.
@@ -61,7 +61,7 @@ Exactly one orchestrated moment, and it is always user-triggered: an element cro
 - axe-core clean in CI on every route.
 - Contrast at least 4.5:1 on both grounds. Ochre and brick on plaster are the pair most likely to fail — check them.
 - Every page readable and comprehensible with JavaScript disabled.
-- Initial route: ≤100KB JS, ≤40KB fonts, ≤60KB CSS, ≤300KB images. LCP under 1.5s on simulated 4G, CLS under 0.02.
+- Initial route: ≤100KB JS, ≤150KB fonts (D34), ≤60KB CSS, ≤300KB images. LCP under 1.5s on simulated 4G, CLS under 0.02.
 - Images: AVIF with fallback, explicit `width` and `height`, `loading="lazy"` below the fold.
 
 ## Explaining frontend work
