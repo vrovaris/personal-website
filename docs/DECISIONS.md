@@ -76,8 +76,11 @@ Consequences: …
 | D40 | Allowed is green; denied saturated; quiet cool; blue is structure | colours superseded by D41; focus rule active |
 | D41 | State colours exist only in machine space | active, supersedes colours in D36/D38/D40 |
 | D42 | User ground is warm plaster, not cool white | active, amends plan §4.1 |
+| D43 | 68ch means 68 characters, not the CSS ch unit | active, clarifies plan §4.2 and §4.3 |
+| D44 | Kernel blocks are ink at every width, not just mobile | active, amends plan §4.3 |
+| D45 | Rule sits flush at the kernel edge, not mid-gutter | active, refines D44 |
 
-**Next free ID: D43.**
+**Next free ID: D46.**
 
 ---
 
@@ -542,3 +545,24 @@ Consequences:
 Reasoning: Vitor found the original ground too intense to read against. It was a cool white — measured, L\* 94.4 with a b\* of −1.7, meaning slightly blue. The replacement is L\* 91.1 with b\* +7.0: three points less bright and decisively warm. It is also closer to what the name always claimed, since lime plaster is warm and the cool white was the odd part.
 Rejected: `#F3EFE7` (warmer but no less bright, so it would not have fixed the complaint) and `#E7E0D2` (deeper, but `--fg-muted` falls to 4.84:1, close enough to the floor to leave no margin).
 Consequences: every user-ground foreground re-verified — `--fg-user` 13.89:1, `--fg-muted` 5.07:1, `--focus` 5.42:1, all passing. No state colour is affected, since D41 confined those to the ink ground. Dark mode (D5) inverts the grounds, so the warm plaster becomes the machine ground there and its pairings get checked again at that point.
+
+**D43 — `68ch` is not a 68-character measure; the prose track is `27.75em`.** *(2026-09-13 · decided by: recommendation, taken as the default · active · clarifies plan §4.2 and §4.3)*
+Reasoning: §4.2 and §4.3 both specify "max 68ch" for prose, meaning a 68-character line. The CSS `ch` unit is not that — it is the advance width of the digit "0", which in Newsreader is 0.5500em while the frequency-weighted average letter is 0.4081em. Taken literally, `68ch` sets a 785px line carrying about **92 characters**, a third past the measure the plan is asking for and outside the 45-75 range the number was chosen from.
+Consequences: `--measure-prose: 27.75em` — 68 × 0.4081em — giving 583px at the 21px body size and a genuine 68-character line. Being in `em` rather than `px`, it scales if the prose size changes. The same trap applies to the 18ch kernel track, already avoided in P1-03 for a different reason: `ch` on the grid container resolves against the prose font, not the mono one, so `--measure-kernel` is written as `calc(18 * 0.6 * var(--size-m))` using Commit Mono's measured 0.600em advance.
+Note for anyone reading §4.2 later: "68ch" in the plan means 68 characters, not the CSS unit. The plan is patched to say so.
+
+**D44 — Kernel blocks carry the ink ground on desktop too, not only in the mobile stack.** *(2026-09-13 · decided by: Vitor, from review · active · amends plan §4.3)*
+Reasoning: §4.3 says kernel blocks "become" ink bands below 960px, which reads as *not* ink above it, and that is how P1-03 was first built — the desktop kernel track was mono type on plaster, separated by the 1px rule. Rendered, the concept only survived on phones: Vitor reported the dark ground disappearing on a normal Mac screen. D1 calls the two-track layout load-bearing, and the boundary between user space and machine space is the site's identity; having it visible only at the narrowest viewport inverts which screen the design works on.
+Rejected: filling the entire kernel track with ink as a continuous column. It states the territory idea most strongly and would have made the whole track machine ground, but it replaces §4.3's "1px rule is the most recognizable feature" with a dark column, and on a wide screen the centred document places that column some 300px in from the screen edge rather than anchored to it — a floating stripe, not a territory. Also rejected: anchoring that column to the viewport edge, which fixes the floating but abandons the centred layout.
+Consequences:
+1. `.kernel` carries `--ground-machine` at every width. Only its size changes across the breakpoint: a block in the narrow track above 960px, a full-bleed band below it.
+2. **`.kernel` shares the machine-ground token definition with `.ground-machine` in `tokens.css` rather than copying it**, so D41's state colours resolve inside a kernel block. One definition of what machine ground means; the layout keeps placement and type.
+3. The 1px rule survives unchanged, so §4.3's headline feature is intact and now separates two visible grounds rather than two typefaces.
+4. The mobile `border-block` is removed as dead weight — it drew ink on ink. The band's own edge is the horizontal rule §4.3 asks for.
+5. Text in a kernel block is `--fg-machine` on `--ground-machine`, 13.89:1. A focus ring inside one is `--azulejo-light`, 4.51:1, above the 3:1 floor for non-text.
+
+**D45 — The rule sits at the kernel track's edge, flush against the ink blocks, not mid-gutter.** *(2026-09-13 · decided by: Vitor, from review · active · refines D44)*
+Reasoning: once kernel blocks became ink (D44), the 1px rule sat 16px away from each block's right edge, so every annotated row showed two parallel vertical divisions doing the same job. Vitor read it as odd and asked whether the rule was still needed at all. It is, but not where it was.
+The rule earns its place in the gaps, not beside the blocks. Where a kernel block exists, the block edge already divides the tracks. Where none exists — a page with no kernel content, or a long run of prose between annotations — the rule is the only thing marking that there are two territories, and D1 makes that boundary the site's identity. Deleting it would leave "prose with dark blocks to the left of it", which is a common pattern and not this one.
+Rejected: removing the rule and letting the blocks imply the boundary by sharing a right edge. Cheaper, and wrong on exactly the pages with sparse kernel content. Also rejected: dropping the blocks and returning to type-only kernel space, which is what D44 was raised to fix.
+Consequences: `background-position` moves from `--pad + --measure-kernel + --gutter / 2` to `--pad + --measure-kernel`. Blocks now press flush against the rule and read as one boundary; the full 32px gutter falls between the rule and the prose. The rule stays continuous and full-height, so §4.3's headline feature is unchanged in behaviour, only in placement.

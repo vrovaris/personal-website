@@ -76,7 +76,13 @@
   --size-3xl: 4.25rem;
 
   --leading-prose: 1.55;
-  --measure-prose: 68ch;
+  /* 68 characters of Newsreader, whose average advance is 0.4081em. NOT 68ch:
+     ch is the width of "0", which is 0.55em here, so 68ch sets a 92-character
+     line — half again past the measure §4.2 is asking for (D43). */
+  --measure-prose: 27.75em;
+  /* 18 mono characters. Not written as 18ch, because ch on the grid container
+     resolves against the prose font; 0.6 is Commit Mono's measured advance. */
+  --measure-kernel: calc(18 * 0.6 * var(--size-m));
 
   /* §4.1 — radius carries meaning: 0 is machine state, 2px is a prose control */
   --radius-machine: 0;
@@ -87,8 +93,13 @@
    cannot carry four saturated text colours that are all legible AND tellable
    apart, because 4.5:1 against near-white forces them all to the same lightness.
    Referencing --state-* outside this scope resolves to nothing and breaks
-   visibly, which is the intended failure. */
-.ground-machine {
+   visibly, which is the intended failure.
+
+   .kernel shares this definition rather than copying it: a kernel block is
+   machine ground wherever it sits, on either side of the 960px breakpoint
+   (D44). Its placement and type are the layout's business, in Boundary.astro. */
+.ground-machine,
+.kernel {
   background: var(--ground-machine);
   color: var(--fg-machine);
 

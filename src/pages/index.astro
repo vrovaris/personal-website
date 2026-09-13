@@ -1,10 +1,12 @@
 ---
 // Placeholder until P2-01. Exists so the deploy path is proven on day one.
 // noindex comes out at launch (Q10).
-import Base from '../layouts/Base.astro';
+// Deliberately has no kernel block: the rule must still run unbroken when a
+// page has nothing in the narrow track.
+import Boundary from '../layouts/Boundary.astro';
 ---
 
-<Base title="vrovaris.com" noindex>
+<Boundary title="vrovaris.com" noindex>
   <h1>vrovaris.com</h1>
   <p>Under construction.</p>
-</Base>
+</Boundary>

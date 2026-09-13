@@ -2,6 +2,7 @@
 // Internal reference for the design system. Permanently noindex: it is not part
 // of the site's content and no sitemap exists yet to exclude it from (P1-02).
 import Base from '../layouts/Base.astro';
+import Boundary from '../layouts/Boundary.astro';
 
 const scale = [
   ['3xl', '4.25rem'],
@@ -61,6 +62,13 @@ const states = [
       <p>body text, --fg-user</p>
       <p style="color: var(--fg-muted)">secondary text, --fg-muted</p>
     </div>
+
+    <h2>Boundary layout</h2>
+    <p class="note">
+      Resize to cross 960px. Above it, two tracks with a continuous rule; below,
+      the tracks stack and kernel blocks become full-bleed ink bands. The rule is
+      one gradient on the grid container, so it cannot break between sections.
+    </p>
 
     <h2>Focus</h2>
     <p><a href="/">Tab to this link to see the focus ring.</a></p>

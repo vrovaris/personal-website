@@ -1,0 +1,42 @@
+---
+// Internal: exercises the §4.3 grid at every breakpoint. Permanently noindex,
+// and deleted once a real page uses the layout in Phase 2.
+import Boundary from '../layouts/Boundary.astro';
+---
+
+<Boundary title="Layout demo — vrovaris.com" noindex>
+  <h1>Boundary layout</h1>
+
+  <div class="row">
+    <p class="kernel">18ch track<br />mono, --fg-muted</p>
+    <p>
+      The narrow track on the left is kernel space and the wide track is user
+      space. Between them runs a single 1px rule, painted as a background
+      gradient on the container rather than as a border on any child, so it
+      spans the whole document and cannot develop a gap where sections meet.
+    </p>
+  </div>
+
+  <div class="row">
+    <p class="kernel">960px<br />breakpoint</p>
+    <p>
+      Below 960px the two tracks stack into one column and each kernel block
+      becomes a full-bleed band on the ink ground, bounded by horizontal rules.
+      The vertical rule is switched off there rather than rotated.
+    </p>
+  </div>
+
+  <p>
+    This paragraph has no kernel block beside it and is not wrapped in a row.
+    The rule continues past it unchanged, and — the part that matters — the
+    pairing of every row below it is unaffected.
+  </p>
+
+  <div class="row">
+    <p class="kernel">tab order</p>
+    <p>
+      Kernel blocks precede the prose they annotate in the document, so tab
+      order and visual order agree and neither is reordered by the grid.
+    </p>
+  </div>
+</Boundary>

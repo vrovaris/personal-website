@@ -169,7 +169,7 @@ Two families. The split *is* the concept, so it must be strict.
 
 | Role | Family | Notes |
 |---|---|---|
-| Prose, headings, Vitor's voice | **Newsreader** (OFL, Google Fonts, variable) | Optical sizing on. 1.55 line-height. Max 68ch. |
+| Prose, headings, Vitor's voice | **Newsreader** (OFL, Google Fonts, variable) | Optical sizing on. 1.55 line-height. Max 68 characters — *not* the CSS `ch` unit, see D43. |
 | Machine output, labels, dates, nav, tables, terminals | **Commit Mono** (MIT, confirmed — D37) | Never used for prose paragraphs. |
 
 Scale (rem, 16px base): `0.8125 / 0.9375 / 1 / 1.3125 / 1.75 / 2.625 / 4.25`.
@@ -189,7 +189,7 @@ Asymmetric two-track grid. Narrow left track is kernel space, wide right track i
 desktop ≥960px
 ┌──────────────┬─┬────────────────────────────────────────┐
 │ kernel track │ │ user track                             │
-│ (mono, 18ch) │ │ (serif prose, max 68ch)                │
+│ (mono, 18 ch)│ │ (serif prose, max 68 chars)            │
 │              │ │                                        │
 │ Aug 2026     │ │ I spent the summer chasing a fifty      │
 │ →  present   │ │ million dollar difference between two   │
@@ -201,8 +201,12 @@ desktop ≥960px
                 ↑ the boundary
 
 mobile <960px
-Tracks stack. Kernel blocks become full-width ink bands
+Tracks stack. Kernel blocks widen into full-width ink bands
 between prose. The boundary becomes horizontal rules.
+
+Kernel blocks sit on the ink ground at every width (D44) — above
+960px as blocks in the narrow track, below it as full-bleed bands.
+The 1px rule is unchanged and now divides two visible grounds.
 ```
 
 Text is left-aligned throughout. Nothing is centered except the 404.

@@ -26,7 +26,7 @@ No shadows anywhere. Depth comes from ground colour. Radius is `0` on anything r
 
 Two families, strictly separated, because the separation *is* the concept:
 
-- **Newsreader** for prose, headings, anything in Vitor's voice. Max 68ch, 1.55 line-height.
+- **Newsreader** for prose, headings, anything in Vitor's voice. Max 68 characters (not the CSS `ch` unit — D43), 1.55 line-height.
 - **Commit Mono** for machine output, labels, dates, nav, tables, terminals. Never for prose paragraphs.
 
 Scale: `0.8125 / 0.9375 / 1 / 1.3125 / 1.75 / 2.625 / 4.25` rem.
