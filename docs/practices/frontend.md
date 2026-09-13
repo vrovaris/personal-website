@@ -31,6 +31,9 @@ Two families, strictly separated, because the separation *is* the concept:
 
 Scale: `0.8125 / 0.9375 / 1 / 1.3125 / 1.75 / 2.625 / 4.25` rem.
 
+Newsreader has no arrow glyphs. `→` is available in Commit Mono only, so it
+belongs to machine voice — a date range on the kernel track, never in prose.
+
 ## Banned patterns
 
 These are the visual tells of generated work. Any one of them fails review:

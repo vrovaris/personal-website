@@ -17,56 +17,51 @@
   font-display: swap;
 }
 
-/* Fallback faces, remetricked to match the real ones so the swap does not move
-   text. Numbers derived from the actual font metrics, not guessed: Newsreader's
-   x-height is 0.4260em against Georgia's 0.4814, Commit Mono's 0.5400 against
-   Menlo's 0.5469. */
+/* Fallback faces, remetricked so the swap does not move text. size-adjust
+   matches average ADVANCE WIDTH, weighted by English letter frequency — width
+   decides where lines wrap, which decides line count and block height, which is
+   what CLS measures. Matching x-height instead looks right mid-swap but rewraps
+   the paragraph: Newsreader 0.4081em vs Georgia 0.4459em, Commit Mono 0.6000em
+   vs Menlo 0.6021em. ascent/descent are then divided through by size-adjust. */
 @font-face {
   font-family: 'Newsreader Fallback';
   src: local('Georgia'), local('Times New Roman'), local('serif');
-  size-adjust: 88.48%;
-  ascent-override: 83.07%;
-  descent-override: 29.95%;
+  size-adjust: 91.53%;
+  ascent-override: 80.30%;
+  descent-override: 28.95%;
   line-gap-override: 0%;
 }
 
 @font-face {
   font-family: 'Commit Mono Fallback';
   src: local('Menlo'), local('Consolas'), local('monospace');
-  size-adjust: 98.74%;
-  ascent-override: 91.15%;
-  descent-override: 20.25%;
+  size-adjust: 99.66%;
+  ascent-override: 90.31%;
+  descent-override: 20.07%;
   line-gap-override: 0%;
 }
 
 :root {
-  /* palette — referenced only in this block */
-  --plaster: #edeff2;
+  /* palette — referenced only in this block.
+     State colours are tuned for the ink ground, the only place they appear. */
+  --plaster: #ebe5d8;
   --ink: #101a2b;
   --azulejo: #1f5aa8;
-  --bisque: #dcd3c4;
-  --ochre: #c9873a;
-  --brick: #a8341f;
-
-  /* palette, contrast-corrected variants (D36). Same hues, moved only far
-     enough to clear 4.5:1 on the ground they are used against. */
-  --ochre-deep: #946229;
-  --bisque-deep: #7d6a4a;
   --azulejo-light: #3f82dc;
-  --brick-light: #dc573f;
+  --slate: #566070;
+  --verdigris: #66d696;
+  --ochre: #d89d58;
+  --brick: #f2603f;
+  --bisque: #e4dccf;
 
   /* semantic — everything outside this file uses these */
   --ground-user: var(--plaster);
   --ground-machine: var(--ink);
   --fg-user: var(--ink);
   --fg-machine: var(--plaster);
+  --fg-muted: var(--slate);
   --boundary: var(--ink);
-
-  /* state colours, valued for the user ground; .ground-machine revalues them */
-  --state-allowed: var(--azulejo);
-  --state-quiet: var(--bisque-deep);
-  --state-trapped: var(--ochre-deep);
-  --state-denied: var(--brick);
+  --focus: var(--azulejo);
 
   /* type — §4.2 */
   --font-prose: 'Newsreader', 'Newsreader Fallback', Georgia, serif;
@@ -82,35 +77,42 @@
 
   --leading-prose: 1.55;
   --measure-prose: 68ch;
-  --measure-kernel: 18ch;
-
-  /* §4.4 — the one orchestrated moment */
-  --motion-cross: 240ms cubic-bezier(0.2, 0, 0, 1);
 
   /* §4.1 — radius carries meaning: 0 is machine state, 2px is a prose control */
   --radius-machine: 0;
   --radius-user: 2px;
 }
 
-/* On the ink ground, four state colours fail 4.5:1 at their user-ground values.
-   Components keep writing --state-allowed and stay correct on either side. */
+/* Machine space. The four state colours exist only here (D41) — a light ground
+   cannot carry four saturated text colours that are all legible AND tellable
+   apart, because 4.5:1 against near-white forces them all to the same lightness.
+   Referencing --state-* outside this scope resolves to nothing and breaks
+   visibly, which is the intended failure. */
 .ground-machine {
-  --state-allowed: var(--azulejo-light);
-  --state-quiet: var(--bisque);
+  background: var(--ground-machine);
+  color: var(--fg-machine);
+
+  --focus: var(--azulejo-light);
+  --state-allowed: var(--verdigris);
   --state-trapped: var(--ochre);
-  --state-denied: var(--brick-light);
+  --state-denied: var(--brick);
+  --state-quiet: var(--bisque);
 }
 
 body {
   background: var(--ground-user);
   color: var(--fg-user);
   font-family: var(--font-prose);
-  font-size: var(--size-m);
+  /* --size-l, not --size-m: Newsreader's x-height is 0.426em against a normal
+     face's ~0.50, so 1rem renders about 20% small. 1.3125rem puts the x-height
+     at 8.95px, which reads like a 17px sans. Machine voice next to it wants
+     --size-m, not --size-s, to match optically (D39). */
+  font-size: var(--size-l);
   line-height: var(--leading-prose);
   margin: 0;
 }
 
 :focus-visible {
-  outline: 2px solid var(--state-allowed);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }

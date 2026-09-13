@@ -69,10 +69,15 @@ Consequences: …
 | D33 | Symlinks are tracked; machine-local Claude state is not | active |
 | D34 | Font budget raised to 150KB; both Newsreader axes kept | active, amends plan §10 and P1-02 |
 | D35 | Astro 7 rather than Astro 5; adapter and wrangler follow | active, amends plan §6 and P1-01 |
-| D36 | State colours revalued per ground, scoped by selector | active, amends plan §4.1 |
+| D36 | State colours revalued per ground, scoped by selector | colours superseded by D41; scoping mechanism active |
 | D37 | Commit Mono is MIT; licences ship; masters stay untracked | active, answers Q7 |
+| D38 | User-ground trapped and quiet revised for mutual distinguishability | superseded by D40, then D41 |
+| D39 | Prose body is --size-l; scale itself unchanged | active, clarifies plan §4.2 |
+| D40 | Allowed is green; denied saturated; quiet cool; blue is structure | colours superseded by D41; focus rule active |
+| D41 | State colours exist only in machine space | active, supersedes colours in D36/D38/D40 |
+| D42 | User ground is warm plaster, not cool white | active, amends plan §4.1 |
 
-**Next free ID: D38.**
+**Next free ID: D43.**
 
 ---
 
@@ -459,3 +464,81 @@ Consequences:
 2. `public/fonts/PROVENANCE.md` records source, version, licence, and the exact subsetting commands, per D34 consequence 5.
 3. **The unsubsetted originals live in `fonts-src/`, which is gitignored.** Subsetting overwrites what is in `public/fonts/`, so without this the only copies of the masters would have been destroyed the first time the subset ran. They are Vitor's files and he holds the masters.
 4. `/colophon` (P2-06) credits both faces and links these files.
+
+
+---
+
+## 2026-09-12 — Revising the user-ground colours
+
+**D38 — The user-ground values for `--state-trapped` and `--state-quiet` are replaced; contrast alone was the wrong target.** *(2026-09-12 · decided by: Vitor, from review · active · supersedes the user-ground half of D36; D36's machine-ground values and its scoping mechanism stand)*
+
+Reasoning: D36 corrected four colours by moving each the minimum distance needed to clear 4.5:1 while holding its hue. On the ink ground that worked. On the plaster ground it produced `#946229` and `#7D6A4A` — two mid-browns that clear the contrast floor against the *background* and fail against *each other*. Vitor called them on sight; measured, they sit at ΔE 22.3, under the ~25 where two colours stop being tellable apart. A state colour that cannot be distinguished from another state colour does not do its job, and no contrast ratio detects that, because the ratio only ever looks at one pair.
+
+| | old | new | contrast | ΔE to the other |
+|---|---|---|---|---|
+| `--state-trapped` | `#946229` | **`#8A5A15`** | 4.51 → **5.13** | 22.3 → **42.7** |
+| `--state-quiet` | `#7D6A4A` | **`#6B6560`** | 4.52 → **4.99** | " | " |
+
+The separation comes from chroma, not lightness: trapped stays saturated ochre (chroma 47), quiet drops to near-neutral warm grey (chroma 4). One is orange, one is grey, and no amount of squinting merges them. Both also gained contrast, which answers the second half of the report — at 4.51 the old pair sat exactly on the floor, which is a pass and still hard to read.
+
+Rejected: a search that maximised perceptual distance, which drove trapped to `#4A351C` at 10:1 — excellent numbers, no longer recognisably ochre. Optimising a colour system on one metric is what produced the defect in the first place.
+
+Consequences:
+1. The palette entry `--bisque-deep` is renamed **`--warm-grey`**, because `#6B6560` is no longer bisque in any meaningful sense and a name that lies is worse than a new name. `--bisque` itself is untouched and still carries `--state-quiet` on the machine ground, where it measures 11.75.
+2. **Contrast is a floor, not the specification.** Any future palette change checks each colour against its ground *and* against the other states on that ground. ΔE ≥ 25 is the working threshold.
+3. D36's mechanism — `:root` for user ground, `.ground-machine` revaluing the same names — is unchanged and is what made this a two-value edit.
+
+**D39 — Prose body is `--size-l` (1.3125rem), not `--size-m`.** *(2026-09-12 · decided by: recommendation after Vitor reported the body text reading small · active · clarifies plan §4.2, does not change the scale)*
+Reasoning: §4.2's scale is sound but says nothing about which step body prose takes, and 1rem was the obvious-looking default. Newsreader's x-height is 0.4260em where a typical text face sits near 0.50, so at 16px it renders a 6.8px x-height against Georgia's 7.7px — a fifth smaller than the same nominal size in almost any other face. `--size-l` gives 8.95px, equivalent to a 17px sans, which is ordinary editorial prose sizing at a 68ch measure.
+Rejected: adding 1.125rem to the scale, which matches Georgia-at-16px exactly but amends §4.2 to solve something an existing step already solves.
+Consequences: the seven scale values in §4.2 are unchanged. Machine voice set beside body prose uses `--size-m`, not `--size-s` — Commit Mono's x-height is 0.540, so 16px of it optically matches 21px of Newsreader. Sizing the two families by their nominal size rather than their x-height is what makes a serif-plus-mono pairing look wrong.
+
+**D40 — Allowed becomes green, denied gains saturation, quiet goes cool; blue is structure only.** *(2026-09-12 · decided by: Vitor, from review · active · supersedes the colour values in D36 and D38; plan §4.1's palette block is amended)*
+Reasoning: three separate findings from looking at the rendered styleguide. `--state-allowed` was azulejo, and blue state on a deep slate-navy ground reads as blue-on-blue no matter what the ratio says — 4.51:1 was a passing number for an unusable pairing. Moving allowed to green also resolves a tension already in §4.1, which says blue and ink carry *structure*: blue was doing double duty as structure and as a state, and now does neither job ambiguously. Separately, brick was not saturated enough to read as an alarm, and the revised quiet from D38 still sat too close to ochre — both are warm mid-tones, and dropping chroma alone was not enough.
+
+| token | ground | was | now | contrast |
+|---|---|---|---|---|
+| `--state-allowed` | plaster | `#1F5AA8` | `#17703C` | 5.91 → 5.33 |
+| `--state-allowed` | ink | `#3F82DC` | `#4CC17E` | 2.56 → **7.67** |
+| `--state-denied` | plaster | `#A8341F` | `#B82508` | 5.74 → 5.51 |
+| `--state-denied` | ink | `#DC573F` | `#F2603F` | 4.55 → 5.41 |
+| `--state-quiet` | plaster | `#6B6560` | `#566070` | 4.99 → 5.52 |
+
+Separation could not come from brightening ochre — `#A0690A` reads better but falls to 4.03:1, under the floor. It came from moving quiet to a cool slate, opposing ochre in hue rather than only in chroma. Worst pair on either ground is now ΔE 42.9 (plaster) and 36.2 (ink), against 22.3 when the defect was reported.
+
+Rejected: keeping allowed blue and deepening the ground instead, which would have broken §4.1's ink.
+
+Consequences:
+1. New palette entries `--verdigris #17703C` and `--verdigris-light #4CC17E`; `--warm-grey` from D38 is renamed `--slate` and revalued; `--brick` is revalued in the palette block itself rather than gaining a variant.
+2. **`--azulejo` no longer backs any `--state-*` token.** It now carries `--focus`, a new semantic name, so the focus ring stays blue and structural on both grounds. Blue is structure, exactly as §4.1 says.
+3. Plan §4.1's palette block no longer matches `tokens.css` and is amended by this entry. The rule in §4.1 that "ochre and brick appear only where something is genuinely trapped or denied" is unchanged.
+
+**D41 — State colours exist only in machine space.** *(2026-09-13 · decided by: Vitor · active · supersedes the colour values in D36, D38 and D40; amends plan §4.1)*
+Reasoning: three attempts to make four state colours work on the plaster ground all failed on Vitor's eye, and the third attempt showed why it was never going to work. Requiring 4.5:1 against a near-white ground *is* a lightness constraint, so four colours tuned to clear it all land at the same lightness — measured, they sat at L\* 40 to 42, and small text is read by lightness before hue. The usable band on plaster is L\* 9 to 46, 37 points for four colours; on ink it is 54 to 100, 46 points, and a dark ground carries saturation far better. Vitor had already said the machine-ground set looked right.
+
+This also resolves a concept problem rather than a rendering one. §4.1 says ochre and brick appear only where something is trapped or denied — those are kernel states. The gate is a kernel-space interactive. Putting machine state exclusively in machine space sharpens D1's boundary instead of fighting it.
+
+Final values, all on the ink ground, spread deliberately across the lightness band rather than bunched at the contrast floor:
+
+| token | value | contrast | L\* |
+|---|---|---|---|
+| `--state-denied` | `#F2603F` | 5.41 | 59.5 |
+| `--state-trapped` | `#D89D58` | 7.37 | 69.1 |
+| `--state-allowed` | `#66D696` | 9.65 | 77.9 |
+| `--state-quiet` | `#E4DCCF` | 12.81 | 88.1 |
+
+Worst pair: ΔE 41.0, 8.9 L\* apart. The previous machine-ground set would have shipped trapped and denied 2.2 L\* apart — orange against red at identical value, the worst case for red-green colour blindness — which contrast ratios and ΔE both passed.
+
+Rejected: spreading lightness on the plaster ground (option A), which reached a 15-point gap but turned ochre into a dark brown and left green and red at the same value.
+
+Consequences:
+1. **`--state-*` is defined only inside `.ground-machine`.** Referencing one on the user ground resolves to nothing and breaks visibly. That is deliberate — it caught a wrong reference in the styleguide immediately.
+2. `.ground-machine` now sets ground, foreground, focus and the four states together: one class means "you are in machine space".
+3. The user ground keeps `--fg-user`, `--fg-muted` (`#566070`, 5.52:1) and `--focus`. Prose does not need state colour.
+4. **Contrast is a floor; lightness spread and ΔE are the specification.** Every future palette change checks all three. Two defects reached Vitor because only the first was checked.
+5. Per-ground variants remain only for `--focus`, so blue stays structural on both grounds (D40).
+
+**D42 — The user ground is warm plaster `#EBE5D8`, not the cool white `#EDEFF2`.** *(2026-09-13 · decided by: Vitor · active · amends plan §4.1)*
+Reasoning: Vitor found the original ground too intense to read against. It was a cool white — measured, L\* 94.4 with a b\* of −1.7, meaning slightly blue. The replacement is L\* 91.1 with b\* +7.0: three points less bright and decisively warm. It is also closer to what the name always claimed, since lime plaster is warm and the cool white was the odd part.
+Rejected: `#F3EFE7` (warmer but no less bright, so it would not have fixed the complaint) and `#E7E0D2` (deeper, but `--fg-muted` falls to 4.84:1, close enough to the floor to leave no margin).
+Consequences: every user-ground foreground re-verified — `--fg-user` 13.89:1, `--fg-muted` 5.07:1, `--focus` 5.42:1, all passing. No state colour is affected, since D41 confined those to the ink ground. Dark mode (D5) inverts the grounds, so the warm plaster becomes the machine ground there and its pairings get checked again at that point.

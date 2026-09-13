@@ -116,25 +116,48 @@ Semantic names, so the later dark mode is a swap and not a refactor (D5). Raw va
 ```css
 :root {
   /* palette — referenced only in this block */
-  --plaster:  #EDEFF2;  /* cool white */
+  --plaster:  #EBE5D8;  /* warm plaster, not paper white (D42) */
   --ink:      #101A2B;  /* deep slate-navy */
-  --azulejo:  #1F5AA8;  /* Bulcão blue */
-  --bisque:   #DCD3C4;  /* warm neutral */
-  --ochre:    #C9873A;
-  --brick:    #A8341F;
+  --azulejo:  #1F5AA8;  /* Bulcão blue — structure only, never a state (D40) */
+  --azulejo-light: #3F82DC;  /* the same blue, cut for the ink ground */
+  --slate:    #566070;  /* secondary prose text */
 
-  /* semantic — everything else uses these */
+  /* state palette — tuned for the ink ground, the only place it appears (D41) */
+  --brick:     #F2603F;
+  --ochre:     #D89D58;
+  --verdigris: #66D696;
+  --bisque:    #E4DCCF;
+
+  /* semantic, user space */
   --ground-user:    var(--plaster);
   --ground-machine: var(--ink);
   --fg-user:        var(--ink);
   --fg-machine:     var(--plaster);
+  --fg-muted:       var(--slate);
   --boundary:       var(--ink);
-  --state-allowed:  var(--azulejo);
-  --state-quiet:    var(--bisque);
+  --focus:          var(--azulejo);
+}
+
+/* semantic, machine space — the four states exist here and nowhere else */
+.ground-machine {
+  --focus:          var(--azulejo-light);
+  --state-allowed:  var(--verdigris);
   --state-trapped:  var(--ochre);
   --state-denied:   var(--brick);
+  --state-quiet:    var(--bisque);
 }
 ```
+
+State colour is machine-space colour (D41). A light ground cannot carry four
+saturated text colours that are both legible and tellable apart: 4.5:1 against
+near-white is itself a lightness constraint, so all four land on the same value.
+Prose keeps `--fg-user`, `--fg-muted` and `--focus`.
+
+A state colour must clear 4.5:1 against its ground, stay roughly 25 dE from the
+other states, **and** sit at least 8 L\* from them. Contrast alone passed two
+palettes whose colours were indistinguishable from each other; dE alone passed
+one whose colours shared a lightness. `src/styles/tokens.css` is the
+implementation.
 
 **How dark mode will work later.** The concept already spends both a light and a dark ground, so a dark theme cannot simply darken everything. It **inverts which side is dark**: `--ground-user` becomes ink, `--ground-machine` becomes plaster. The relationship survives, the identity survives, and the change is six lines under `[data-theme="dark"]`. Wire the `data-theme` attribute and the `prefers-color-scheme` listener in Phase 1; ship one theme.
 

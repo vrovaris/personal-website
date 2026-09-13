@@ -15,7 +15,7 @@ Regenerate with `fonttools` (not a project dependency — run it locally):
 
 ```
 U="U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,\
-U+2000-206F,U+2074,U+20AC,U+2122,U+2212,U+2215,U+FEFF,U+FFFD"
+U+2000-206F,U+2074,U+20AC,U+2122,U+2190-21BB,U+2212,U+2215,U+FEFF,U+FFFD"
 
 pyftsubset fonts-src/newsreader.woff2 --unicodes="$U" \
   --layout-features='kern,liga,calt,onum,frac' \
@@ -26,5 +26,9 @@ pyftsubset fonts-src/commit-mono.woff2 --unicodes="$U" \
   --flavor=woff2 --output-file=public/fonts/commit-mono.woff2
 ```
 
-The range is Latin-1 plus general punctuation: 223 codepoints, which covers
-Portuguese in full, so D5's deferred locale is not foreclosed.
+The range is Latin-1, general punctuation, and arrows: 224 codepoints, which
+covers Portuguese in full, so D5's deferred locale is not foreclosed.
+
+**Newsreader contains no arrow glyphs** — not a subsetting loss, the master has
+none. `→` renders in Commit Mono only, which suits §4.2 since arrows are machine
+voice. An arrow in prose falls back to another font and will look wrong.

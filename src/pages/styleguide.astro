@@ -29,7 +29,7 @@ const states = [
     {
       scale.map(([name, size]) => (
         <p class="specimen" style={`font-size: var(--size-${name})`}>
-          <span class="label">{name} · {size}</span>
+          <span class="label">{name} {size}</span>
           Vitor chased a fifty million dollar difference.
         </p>
       ))
@@ -41,22 +41,25 @@ const states = [
     </p>
 
     <h2>Machine voice</h2>
-    <p class="machine">Aug 2026 → present · 371 notes/mo · $140M flow</p>
+    <p class="machine">Aug 2026<br />→ present</p>
+    <p class="machine">371 notes/mo<br />$140M flow</p>
 
-    <h2>State colours</h2>
-    <div class="grounds">
-      <div class="swatches">
-        <p class="label">user ground</p>
-        {states.map(([token, name]) => (
-          <p style={`color: var(${token})`}>{name}</p>
-        ))}
-      </div>
-      <div class="swatches ground-machine">
-        <p class="label">machine ground</p>
-        {states.map(([token, name]) => (
-          <p style={`color: var(${token})`}>{name}</p>
-        ))}
-      </div>
+    <h2>State colours — machine space only</h2>
+    <p class="note">
+      Four saturated colours that are legible and tellable apart do not fit on
+      the light ground: 4.5:1 against near-white forces them all to one
+      lightness. They live here instead (D41).
+    </p>
+    <div class="ground-machine swatches">
+      {states.map(([token, name]) => (
+        <p class="machine" style={`color: var(${token})`}>{name}</p>
+      ))}
+    </div>
+
+    <h2>Prose colours — user space</h2>
+    <div class="swatches">
+      <p>body text, --fg-user</p>
+      <p style="color: var(--fg-muted)">secondary text, --fg-muted</p>
     </div>
 
     <h2>Focus</h2>
@@ -95,24 +98,16 @@ const states = [
 
   .label {
     display: block;
-    color: var(--state-quiet);
-  }
-
-  .grounds {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1px;
-    background: var(--boundary);
+    color: var(--fg-muted);
   }
 
   .swatches {
-    background: var(--ground-user);
-    flex: 1 1 14rem;
     padding: 1rem;
   }
 
-  .swatches.ground-machine {
-    background: var(--ground-machine);
-    color: var(--fg-machine);
+  .note {
+    color: var(--fg-muted);
+    font-size: var(--size-s);
+    max-width: 46ch;
   }
 </style>
