@@ -1,0 +1,118 @@
+---
+// Internal reference for the design system. Permanently noindex: it is not part
+// of the site's content and no sitemap exists yet to exclude it from (P1-02).
+import Base from '../layouts/Base.astro';
+
+const scale = [
+  ['3xl', '4.25rem'],
+  ['2xl', '2.625rem'],
+  ['xl', '1.75rem'],
+  ['l', '1.3125rem'],
+  ['m', '1rem'],
+  ['s', '0.9375rem'],
+  ['xs', '0.8125rem'],
+];
+
+const states = [
+  ['--state-allowed', 'allowed'],
+  ['--state-quiet', 'quiet'],
+  ['--state-trapped', 'trapped'],
+  ['--state-denied', 'denied'],
+];
+---
+
+<Base title="Styleguide — vrovaris.com" noindex>
+  <main>
+    <h1>Styleguide</h1>
+
+    <h2>Type scale</h2>
+    {
+      scale.map(([name, size]) => (
+        <p class="specimen" style={`font-size: var(--size-${name})`}>
+          <span class="label">{name} · {size}</span>
+          Vitor chased a fifty million dollar difference.
+        </p>
+      ))
+    }
+
+    <h2>Weight axis, 200 to 800</h2>
+    <p class="axis">
+      {[200, 400, 600, 800].map((w) => <span style={`font-weight: ${w}`}>Newsreader {w}</span>)}
+    </p>
+
+    <h2>Machine voice</h2>
+    <p class="machine">Aug 2026 → present · 371 notes/mo · $140M flow</p>
+
+    <h2>State colours</h2>
+    <div class="grounds">
+      <div class="swatches">
+        <p class="label">user ground</p>
+        {states.map(([token, name]) => (
+          <p style={`color: var(${token})`}>{name}</p>
+        ))}
+      </div>
+      <div class="swatches ground-machine">
+        <p class="label">machine ground</p>
+        {states.map(([token, name]) => (
+          <p style={`color: var(${token})`}>{name}</p>
+        ))}
+      </div>
+    </div>
+
+    <h2>Focus</h2>
+    <p><a href="/">Tab to this link to see the focus ring.</a></p>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: var(--measure-prose);
+    padding: 2rem 1rem;
+  }
+
+  h2 {
+    font-family: var(--font-machine);
+    font-size: var(--size-s);
+    font-weight: 400;
+    margin-top: 3rem;
+  }
+
+  .specimen,
+  .axis span {
+    margin: 0.5rem 0;
+  }
+
+  .axis span {
+    display: block;
+    font-size: var(--size-l);
+  }
+
+  .label,
+  .machine {
+    font-family: var(--font-machine);
+    font-size: var(--size-xs);
+  }
+
+  .label {
+    display: block;
+    color: var(--state-quiet);
+  }
+
+  .grounds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1px;
+    background: var(--boundary);
+  }
+
+  .swatches {
+    background: var(--ground-user);
+    flex: 1 1 14rem;
+    padding: 1rem;
+  }
+
+  .swatches.ground-machine {
+    background: var(--ground-machine);
+    color: var(--fg-machine);
+  }
+</style>

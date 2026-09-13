@@ -1,0 +1,116 @@
+/* Design system for vrovaris.com — plan §4.1 and §4.2.
+   Raw hex appears in the palette block below and nowhere else in the project. */
+
+@font-face {
+  font-family: 'Newsreader';
+  src: url('/fonts/newsreader.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Commit Mono';
+  src: url('/fonts/commit-mono.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fallback faces, remetricked to match the real ones so the swap does not move
+   text. Numbers derived from the actual font metrics, not guessed: Newsreader's
+   x-height is 0.4260em against Georgia's 0.4814, Commit Mono's 0.5400 against
+   Menlo's 0.5469. */
+@font-face {
+  font-family: 'Newsreader Fallback';
+  src: local('Georgia'), local('Times New Roman'), local('serif');
+  size-adjust: 88.48%;
+  ascent-override: 83.07%;
+  descent-override: 29.95%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Commit Mono Fallback';
+  src: local('Menlo'), local('Consolas'), local('monospace');
+  size-adjust: 98.74%;
+  ascent-override: 91.15%;
+  descent-override: 20.25%;
+  line-gap-override: 0%;
+}
+
+:root {
+  /* palette — referenced only in this block */
+  --plaster: #edeff2;
+  --ink: #101a2b;
+  --azulejo: #1f5aa8;
+  --bisque: #dcd3c4;
+  --ochre: #c9873a;
+  --brick: #a8341f;
+
+  /* palette, contrast-corrected variants (D36). Same hues, moved only far
+     enough to clear 4.5:1 on the ground they are used against. */
+  --ochre-deep: #946229;
+  --bisque-deep: #7d6a4a;
+  --azulejo-light: #3f82dc;
+  --brick-light: #dc573f;
+
+  /* semantic — everything outside this file uses these */
+  --ground-user: var(--plaster);
+  --ground-machine: var(--ink);
+  --fg-user: var(--ink);
+  --fg-machine: var(--plaster);
+  --boundary: var(--ink);
+
+  /* state colours, valued for the user ground; .ground-machine revalues them */
+  --state-allowed: var(--azulejo);
+  --state-quiet: var(--bisque-deep);
+  --state-trapped: var(--ochre-deep);
+  --state-denied: var(--brick);
+
+  /* type — §4.2 */
+  --font-prose: 'Newsreader', 'Newsreader Fallback', Georgia, serif;
+  --font-machine: 'Commit Mono', 'Commit Mono Fallback', Menlo, monospace;
+
+  --size-xs: 0.8125rem;
+  --size-s: 0.9375rem;
+  --size-m: 1rem;
+  --size-l: 1.3125rem;
+  --size-xl: 1.75rem;
+  --size-2xl: 2.625rem;
+  --size-3xl: 4.25rem;
+
+  --leading-prose: 1.55;
+  --measure-prose: 68ch;
+  --measure-kernel: 18ch;
+
+  /* §4.4 — the one orchestrated moment */
+  --motion-cross: 240ms cubic-bezier(0.2, 0, 0, 1);
+
+  /* §4.1 — radius carries meaning: 0 is machine state, 2px is a prose control */
+  --radius-machine: 0;
+  --radius-user: 2px;
+}
+
+/* On the ink ground, four state colours fail 4.5:1 at their user-ground values.
+   Components keep writing --state-allowed and stay correct on either side. */
+.ground-machine {
+  --state-allowed: var(--azulejo-light);
+  --state-quiet: var(--bisque);
+  --state-trapped: var(--ochre);
+  --state-denied: var(--brick-light);
+}
+
+body {
+  background: var(--ground-user);
+  color: var(--fg-user);
+  font-family: var(--font-prose);
+  font-size: var(--size-m);
+  line-height: var(--leading-prose);
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--state-allowed);
+  outline-offset: 2px;
+}

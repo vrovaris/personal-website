@@ -147,7 +147,7 @@ Two families. The split *is* the concept, so it must be strict.
 | Role | Family | Notes |
 |---|---|---|
 | Prose, headings, Vitor's voice | **Newsreader** (OFL, Google Fonts, variable) | Optical sizing on. 1.55 line-height. Max 68ch. |
-| Machine output, labels, dates, nav, tables, terminals | **Commit Mono** (free; confirm current license at download) | Never used for prose paragraphs. |
+| Machine output, labels, dates, nav, tables, terminals | **Commit Mono** (MIT, confirmed — D37) | Never used for prose paragraphs. |
 
 Scale (rem, 16px base): `0.8125 / 0.9375 / 1 / 1.3125 / 1.75 / 2.625 / 4.25`.
 

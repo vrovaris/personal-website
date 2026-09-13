@@ -69,8 +69,10 @@ Consequences: …
 | D33 | Symlinks are tracked; machine-local Claude state is not | active |
 | D34 | Font budget raised to 150KB; both Newsreader axes kept | active, amends plan §10 and P1-02 |
 | D35 | Astro 7 rather than Astro 5; adapter and wrangler follow | active, amends plan §6 and P1-01 |
+| D36 | State colours revalued per ground, scoped by selector | active, amends plan §4.1 |
+| D37 | Commit Mono is MIT; licences ship; masters stay untracked | active, answers Q7 |
 
-**Next free ID: D36.**
+**Next free ID: D38.**
 
 ---
 
@@ -425,3 +427,35 @@ Consequences:
 5. **The adapter generates a `wrangler.json` declaring a `SESSION` KV binding and an `IMAGES` binding.** Neither exists in the account and neither is used while every route is static. If the first deploy fails on a missing binding, this is why.
 6. **`esbuild` and `workerd` need their install scripts approved**, recorded in `pnpm-workspace.yaml` so a fresh clone and CI do not hit the same prompt. `workerd` is Cloudflare's runtime and local preview does not work without it.
 7. **Node is pinned to >=22.12.0**, Astro 7's floor, in `package.json` and in CI. Cloudflare Pages needs `NODE_VERSION` set to match.
+
+
+---
+
+## 2026-09-12 — Contrast and font licensing
+
+**D36 — State colours carry a different value on each ground, scoped by selector rather than renamed.** *(2026-09-12 · decided by: Vitor · active · amends plan §4.1)*
+
+Reasoning: measured against the two grounds, four of §4.1's colours fail the 4.5:1 floor that plan §10 calls non-negotiable. §10 anticipated the wrong pair — it warned about ochre and brick on plaster; brick on plaster passes at 5.74, and the two worst failures are on the ink ground, which §10 does not mention at all. `--state-allowed` on the kernel track is the one that matters most, since the gate uses it constantly.
+
+| | on plaster | on ink |
+|---|---|---|
+| azulejo `#1F5AA8` | 5.91 | **2.56** |
+| ochre `#C9873A` | **2.60** | 5.82 |
+| brick `#A8341F` | 5.74 | **2.64** |
+| bisque `#DCD3C4` | **1.29** | 11.75 |
+
+Corrected values, same hue, moved only far enough to clear 4.5:1: `--ochre-deep #946229` (4.51) and `--bisque-deep #7D6A4A` (4.52) for the user ground; `--azulejo-light #3F82DC` (4.51) and `--brick-light #DC573F` (4.55) for the machine ground.
+
+Rejected: distinct token names per ground (`--state-allowed-on-machine`). Explicit, but it pushes the decision into every component and doubles what the two-track layout in P1-03 has to reason about.
+
+Consequences: `:root` holds the user-ground values and a single `.ground-machine` selector revalues the same four names, so a component writes `--state-allowed` and is correct on either side of the boundary. The corrected hexes are palette entries in `tokens.css`, so "zero raw hex outside the palette block" still holds. Dark mode (D5) stays a swap of which selector carries which set.
+
+**D37 — Commit Mono is MIT, not OFL; both licences ship with the fonts and the unsubsetted masters stay out of the repository.** *(2026-09-12 · decided by: recommendation, taken as the default · active · answers Q7, closes the open question in plan §4.2)*
+
+Reasoning: plan §4.2 carried "confirm current license at download" against Commit Mono and nobody had. Its repository licence file is MIT, copyright 2023 Eigil Nikolajsen — not OFL, which is what a font is usually assumed to be. Newsreader is OFL 1.1, copyright 2020 The Newsreader Project Authors, read from the font's own name table rather than assumed. Both licences require their notice to travel with the files, and neither was present.
+
+Consequences:
+1. `public/fonts/OFL.txt` and `public/fonts/LICENSE-commit-mono.txt` ship alongside the fonts. Both were fetched from their authoritative sources, not reproduced from memory.
+2. `public/fonts/PROVENANCE.md` records source, version, licence, and the exact subsetting commands, per D34 consequence 5.
+3. **The unsubsetted originals live in `fonts-src/`, which is gitignored.** Subsetting overwrites what is in `public/fonts/`, so without this the only copies of the masters would have been destroyed the first time the subset ran. They are Vitor's files and he holds the masters.
+4. `/colophon` (P2-06) credits both faces and links these files.
