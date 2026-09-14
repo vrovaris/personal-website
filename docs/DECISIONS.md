@@ -43,7 +43,7 @@ Consequences: …
 | D7 | Personal content undecided | open, blocks P2-04/P2-05 |
 | D8 | Budget ceiling $20/year | active |
 | D9 | No graduate-school signaling in v1 | active |
-| D10 | `/resume.pdf` serves the general SWE variant | active |
+| D10 | `/resume.pdf` serves the general SWE variant | active; filename amended by D49 |
 | D11 | Instructor ruling: do not post the projects; writing is permitted | active, narrowed by D17 |
 | D12 | New grammar is hand-written recursive descent in C | active |
 | D13 | CS 307 / CS 407 projects publishable when taken | active, not yet actionable |
@@ -82,8 +82,9 @@ Consequences: …
 | D46 | Locale in the directory; getLocalised is the only accessor | active, implements P1-04 |
 | D47 | profile.json owns repo links; non-public repos carry none | active, supersedes point 4 of D46 |
 | D48 | Only lint rule is the raw-import check; other two cut | active, supersedes plan §8 rules and D2 enforcement |
+| D49 | CI compiles resume_web.tex and opens a PR; PDF committed | active, amends D10 and answers Q6 |
 
-**Next free ID: D49.**
+**Next free ID: D50.**
 
 ---
 
@@ -599,3 +600,15 @@ Consequences:
 2. `pnpm build` runs `node tools/lint.mjs && astro check && astro build`, so CI and local builds fail identically.
 3. P1-06's acceptance criteria change from "CI fails on a planted fact violation and on a planted `passport`" to "CI fails on a planted raw import of `profile.json`".
 4. Plan §8, §4.5 and §9 are patched to match. This closes the enforcement gap flagged in P1-05's walkthrough.
+
+**D49 — CI compiles `resume/resume_web.tex` and opens a pull request; the PDF is committed.** *(2026-09-13 · decided by: Vitor · active · amends D10's filename, answers Q6)*
+Reasoning on the filename: D10 named the CI input `resume_general_swe.tex`, written before D31 split a redacted web variant from the full one. The file that exists is `resume/resume_web.tex`, and `_web` encodes a safety property — this is the variant with the phone number removed — which is worth more in a public repository than matching a name chosen for a different reason. D10's choice of *which résumé* is unchanged: the general SWE variant is what `/resume.pdf` serves.
+Reasoning on the architecture: the site deploys through Cloudflare Workers Builds (D35), whose container has no LaTeX, so the PDF cannot be produced at deploy time. It has to exist in the repository before Cloudflare builds. There is also no LaTeX toolchain on Vitor's machine, so "compile locally and commit" is not available either.
+Rejected: moving deployment into GitHub Actions so the PDF never enters git. Cleaner in principle — the artifact cannot go stale and no binary enters history — but it costs a `CLOUDFLARE_API_TOKEN` secret, abandons the Cloudflare Git integration already working, and makes PR previews our problem instead of Cloudflare's. For a file that changes a few times a year, the moving parts cost more than the tidiness is worth.
+Consequences:
+1. `.github/workflows/resume.yml` runs on pushes to `main` touching `resume/**`, and on manual dispatch.
+2. **It opens a pull request rather than pushing to `main`.** Vitor commits by hand and nothing lands without him merging.
+3. `public/resume.pdf` is committed. Roughly 100KB per résumé edit in history — D31's warning about committed binaries is aimed at a shell binary rebuilt constantly, which is a different scale.
+4. **The LaTeX action is pinned to commit `6549dc21` (v4.1.0), not the tag.** It runs with write access to the repository and a tag can be moved to point at anything.
+5. The action's default `args` are used unchanged; they already carry `-halt-on-error -interaction=nonstopmode -file-line-error`, so a LaTeX error fails the job instead of publishing a half-typeset PDF.
+6. The same `.tex` is read directly, not compiled, by `tools/tex-to-ansi` for the `curl` résumé endpoint (plan §6). One source, two outputs.

@@ -27,7 +27,7 @@ Anything an agent could not resolve, and anything waiting on Vitor. Append; do n
 
 *(append below — include the ticket ID you were on)*
 
-**Q6 — Where does the résumé source live, and what is it called?** *(raised during P1-01; blocks nothing until P1-07)*
+~~**Q6 — Where does the résumé source live, and what is it called?**~~ Answered by D49 — it stays `resume/resume_web.tex`, and D10's filename is amended to match. Original text: *(raised during P1-01; blocks nothing until P1-07)*
 `resume_web.tex` sits untracked at the repository root. Two conflicts: D32 says the root holds only `README.md`, `AGENTS.md`, and `CLAUDE.md`, and D10 names the CI input `resume_general_swe.tex`, not `resume_web.tex`. The file's contents are correct — no phone number, `vitor@vrovaris.com` as the only contact — so D31 point 3 is satisfied and this is purely about name and location. Plan §6's repository layout shows `public/resume.pdf` as a CI artifact but gives the `.tex` source no home. Suggest `resume/` or `tools/resume/`, and either renaming the file or amending D10 to match.
 
 ~~**Q7 — Font licences are not in the repository.**~~ Answered by D37 — Newsreader is OFL 1.1, Commit Mono is MIT (not OFL), both licence files now ship in `public/fonts/`. Original text: *(raised during P1-01; actionable in P1-02)*

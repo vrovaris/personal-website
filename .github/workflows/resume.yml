@@ -1,0 +1,60 @@
+name: Resume
+
+# The site builds on Cloudflare, whose container has no LaTeX, so the PDF cannot
+# be produced at deploy time — it has to be in the repo before Cloudflare builds
+# (D49). This compiles it and opens a pull request; nothing lands on main without
+# Vitor merging it.
+
+on:
+  push:
+    branches: [main]
+    paths: ['resume/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # Pinned to a commit, not the v4 tag: this runs with write access to the
+      # repository, and a tag can be moved to point at anything.
+      - name: Compile resume_web.tex
+        uses: xu-cheng/latex-action@6549dc21effb2730855a1281407ecfcececc6c1b # v4.1.0
+        with:
+          root_file: resume_web.tex
+          working_directory: resume
+          # args deliberately not set: the action's default is already
+          # "-pdf -file-line-error -halt-on-error -interaction=nonstopmode",
+          # which fails on a LaTeX error instead of emitting a half-typeset PDF.
+
+      - name: Move the PDF into public/
+        run: |
+          mkdir -p public
+          mv resume/resume_web.pdf public/resume.pdf
+
+      - name: Open a pull request if the PDF changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # --cached, so this is also true the first time, when the PDF is
+          # untracked and a plain `git diff` would report nothing.
+          git add public/resume.pdf
+          if git diff --cached --quiet -- public/resume.pdf; then
+            echo "PDF unchanged; nothing to open."
+            exit 0
+          fi
+          BRANCH="resume-pdf-${GITHUB_SHA::7}"
+          git checkout -b "$BRANCH"
+          git commit -m "P1-07: rebuild resume.pdf from resume_web.tex"
+          git push origin "$BRANCH"
+          gh pr create \
+            --title "Rebuild resume.pdf" \
+            --body "Compiled from \`resume/resume_web.tex\` at ${GITHUB_SHA::7}. Merging publishes it at /resume.pdf." \
+            --base main --head "$BRANCH"

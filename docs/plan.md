@@ -97,7 +97,7 @@ The grid motif for the interactive pieces — a panel of cells, some permitted, 
 /now                  What he's doing this month. nownownow.com convention.
 /colophon             How the site is built, with real measured numbers.
 /guestbook            Visitor messages.
-/resume.pdf           Built in CI from resume_general_swe.tex.
+/resume.pdf           Built in CI from resume/resume_web.tex (D49).
 /404                  ENOENT.
 ```
 
@@ -311,7 +311,7 @@ Cost: a 20–40MB image, desktop only, and a real chance it eats a month. Gate i
 
 ### 5.6 Easter eggs (Phase 5, four maximum)
 
-1. **`curl vrovaris.com`** returns an ANSI-colored plaintext résumé generated from `resume_general_swe.tex`. A Worker sniffs `User-Agent`/`Accept`. Build this one first; it is the best of the four.
+1. **`curl vrovaris.com`** returns an ANSI-colored plaintext résumé generated from `resume/resume_web.tex` (D49). A Worker sniffs `User-Agent`/`Accept`. Build this one first; it is the best of the four.
 2. `/dev/null` — a real route returning 204 and an empty body.
 3. 404 as an errno table with `ENOENT` highlighted.
 4. `/humans.txt`, written properly.
@@ -334,7 +334,7 @@ No Konami code.
 | Domain | **vrovaris.com** at Spaceship, DNS delegated to Cloudflare (D23) | $3.80 first year on a promo code, ~$10.18/year after, free WHOIS privacy. Nameservers point at Cloudflare so Pages, Workers, and D1 work. |
 | Analytics | Cloudflare Web Analytics | No cookies, no consent banner, free. |
 | Tests | Playwright + axe-core, Lighthouse CI | The islands are the risky part. |
-| Résumé | GitHub Action compiles `resume_general_swe.tex` → `/resume.pdf` | Single source of truth; the PDF cannot go stale. |
+| Résumé | GitHub Action compiles `resume/resume_web.tex` → `/resume.pdf` (D49) | Single source of truth; the PDF cannot go stale. |
 
 ### Budget (D8)
 
@@ -489,8 +489,8 @@ Estimates are focused hours for one competent agent or one focused Vitor session
 **P1-06 — Lint rule.** The one rule from §8 (D48).
 *AC:* CI fails on a planted raw import of `profile.json`.
 
-**P1-07 — Résumé CI.** Action compiles `resume_general_swe.tex` → `public/resume.pdf` (D10).
-*AC:* PDF served at `/resume.pdf`; build fails loudly on LaTeX errors.
+**P1-07 — Résumé CI.** Action compiles `resume/resume_web.tex` → `public/resume.pdf` (D10, D49) and opens a pull request.
+*AC:* PDF served at `/resume.pdf`; the job fails loudly on LaTeX errors.
 
 ---
 
