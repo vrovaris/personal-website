@@ -25,8 +25,8 @@ const things = defineCollection({
   schema: z.object({
     title: z.string(),
     summary: z.string(),
-    // Optional, and permanently absent for the shell: no repo link, ever (D3, D26).
-    repo: z.url().optional(),
+    // No repo field: profile.json owns repo links and whether each is public,
+    // so there is one place a private URL could leak from, not two (D47).
   }),
 });
 

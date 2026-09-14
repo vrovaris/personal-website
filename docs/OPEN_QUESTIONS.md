@@ -51,3 +51,10 @@ Do not optimise further against a placeholder. Re-measure once Phase 2 has real 
 
 **Q13 — Revisit the boundary layout's proportions once real content fills it.** *(raised during P1-03)*
 The grid was tuned against a demo page: 18-character kernel track, 68-character prose measure, 32px gutter, ink blocks at `0.5rem 0.75rem` padding. Vitor accepted it while noting he will likely want adjustments once Phase 2 content is in place — real dates, counters and prose behave differently from placeholder text, particularly kernel blocks whose content runs longer than the track is wide. Levers in rough order of effect: block padding, `--measure-kernel`, `--gutter`, then the rule's placement (D45). The rule being continuous is not a lever; it is the identity (D1).
+
+**Q14 — Three things flip together at launch, and forgetting any one is visible.** *(raised during P1-05)*
+When `personal-website` goes public (D32), all of these change in the same pull request:
+1. Remove `<meta name="robots" content="noindex">` from `src/pages/index.astro` — Q10.
+2. Set `this-site` in `src/data/profile.json` to `repo: "https://github.com/vrovaris/personal-website"` and `repoPublic: true`. The Zod refine in `src/profile.ts` rejects the URL while the flag is false, so they must move together (D47).
+3. Write the real `README.md` — D32 consequence 5 says the first file a visitor opens must not be the plan.
+Unrelated to this list and never changing: the shell's repo stays `null` permanently (D3, D21, D26).

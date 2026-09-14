@@ -80,8 +80,9 @@ Consequences: …
 | D44 | Kernel blocks are ink at every width, not just mobile | active, amends plan §4.3 |
 | D45 | Rule sits flush at the kernel edge, not mid-gutter | active, refines D44 |
 | D46 | Locale in the directory; getLocalised is the only accessor | active, implements P1-04 |
+| D47 | profile.json owns repo links; non-public repos carry none | active, supersedes point 4 of D46 |
 
-**Next free ID: D47.**
+**Next free ID: D48.**
 
 ---
 
@@ -578,3 +579,12 @@ Consequences:
 4. `things.repo` is optional and must stay absent for the shell entry: no repository link, ever (D3, D26).
 5. **Astro 7 API specifics**, none of which match the plan's wording: the config is `src/content.config.ts`, loaders come from `astro/loaders`, `z` from `astro:content` is deprecated in favour of `astro/zod`, and `z.string().url()` is deprecated in favour of `z.url()`. Using the plan's assumed API produces eight deprecation warnings.
 6. Empty collections emit one `glob-loader` warning each until Phase 2 adds content. Warnings, not errors; they disappear as entries land.
+
+**D47 — `profile.json` owns repository links, and a non-public repo may not carry one.** *(2026-09-13 · decided by: recommendation, taken as the default · active · supersedes point 4 of D46)*
+Reasoning: P1-04 gave the `things` content collection an optional `repo` field, and plan §8 gives `profile.json` a `things[].repo` plus `repoPublic`. Two homes for the same fact is two places a stale or private URL can live, and §8 is explicit that every fact reads from `profile.json`. The collection keeps prose; the profile keeps facts.
+Separately, `repoPublic` was documentation until it was enforced. A component rendering `thing.repo` without checking the flag would publish a link to a private repository — the exact failure D21 exists to prevent, arriving through a forgotten `if` rather than a bad `git add`.
+Consequences:
+1. The `repo` field is removed from the `things` collection schema. Pages join a content entry to its profile record by slug.
+2. `src/profile.ts` carries a Zod `.refine()`: a thing with `repoPublic: false` must have `repo: null`. Verified by planting a link on the shell entry — the build fails with `a non-public repo must have repo: null` and the offending index. The shell's is null permanently (D3, D21, D26).
+3. **The Zod parse only runs when something imports `src/profile.ts`.** Nothing did, which made "validated at build" vacuous, so `index.astro` now takes its page title from `profile.name`. Any page importing the module keeps the guarantee live; the first Phase 2 page makes it unremarkable.
+4. `this-site` ships `repo: null, repoPublic: false` because `personal-website` is private until launch (D32).

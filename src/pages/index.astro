@@ -4,9 +4,10 @@
 // Deliberately has no kernel block: the rule must still run unbroken when a
 // page has nothing in the narrow track.
 import Boundary from '../layouts/Boundary.astro';
+import { profile } from '../profile';
 ---
 
-<Boundary title="vrovaris.com" noindex>
+<Boundary title={profile.name} noindex>
   <h1>vrovaris.com</h1>
   <p>Under construction.</p>
 </Boundary>
