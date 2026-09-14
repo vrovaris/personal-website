@@ -81,8 +81,9 @@ Consequences: …
 | D45 | Rule sits flush at the kernel edge, not mid-gutter | active, refines D44 |
 | D46 | Locale in the directory; getLocalised is the only accessor | active, implements P1-04 |
 | D47 | profile.json owns repo links; non-public repos carry none | active, supersedes point 4 of D46 |
+| D48 | Only lint rule is the raw-import check; other two cut | active, supersedes plan §8 rules and D2 enforcement |
 
-**Next free ID: D48.**
+**Next free ID: D49.**
 
 ---
 
@@ -588,3 +589,13 @@ Consequences:
 2. `src/profile.ts` carries a Zod `.refine()`: a thing with `repoPublic: false` must have `repo: null`. Verified by planting a link on the shell entry — the build fails with `a non-public repo must have repo: null` and the offending index. The shell's is null permanently (D3, D21, D26).
 3. **The Zod parse only runs when something imports `src/profile.ts`.** Nothing did, which made "validated at build" vacuous, so `index.astro` now takes its page title from `profile.name`. Any page importing the module keeps the guarantee live; the first Phase 2 page makes it unremarkable.
 4. `this-site` ships `repo: null, repoPublic: false` because `personal-website` is private until launch (D32).
+
+**D48 — The fact-checking and banned-word lint rules are cut; the only lint rule is the raw-import check.** *(2026-09-13 · decided by: Vitor · active · supersedes the two rules in plan §8, the enforcement clause of D2, and the "enforced by lint" claim in §4.5)*
+Reasoning: Vitor's ruling on seeing what the two rules would actually do — they are guidance for whoever is writing, not conditions a build should fail on. The detail that made the case: §4.5 bans `driven`, and his own BTG work is an **event-driven** integration, so the rule would have rejected the correct technical term for the thing he built. The fact-checking rule had a matching problem of the same shape, needing code fences stripped to avoid failing on every `$` prompt and `printf("%d")` on a site whose subjects are a shell and a parser.
+**What this costs, recorded deliberately:** D2 remains a hard constraint — citizenship, passports, visas, immigration and work authorisation are never mentioned, anywhere. Its stated consequence was "a build lint fails on" those words, precisely so the rule would not depend on memory. That machine check is gone, so D2 now rests on discipline: the author's, and every agent's. The constraint did not weaken; its enforcement did. Anyone reading D2 later should know the lint it describes does not exist.
+Rejected: keeping the banned-word rule for the D2 words only and dropping the §4.5 adjectives. It would have preserved the mechanical guarantee on the constraint that actually matters, but Vitor's call covered both sets, and a lint scanning for those words has its own problem — `docs/DECISIONS.md` is full of them, because D2 is about them.
+Consequences:
+1. `tools/lint.mjs` implements one rule: nothing outside `src/profile.ts` may import `src/data/profile.json`. Verified by planting an import in a page — the build exits 1 and names file and line.
+2. `pnpm build` runs `node tools/lint.mjs && astro check && astro build`, so CI and local builds fail identically.
+3. P1-06's acceptance criteria change from "CI fails on a planted fact violation and on a planted `passport`" to "CI fails on a planted raw import of `profile.json`".
+4. Plan §8, §4.5 and §9 are patched to match. This closes the enforcement gap flagged in P1-05's walkthrough.

@@ -221,7 +221,7 @@ Everything else: no scroll reveals, no fade-and-slide-up on sections, no hover l
 
 - English is conversational and specific. When Portuguese arrives later it is a rewrite, not a translation.
 - Numbers stay exact and sourced. "$50M discrepancy" beats "large discrepancy" and it's true.
-- Banned strings, enforced by lint: `passionate`, `driven`, `detail-oriented`, `results-oriented`, `team player`, `hit the ground running`.
+- Strings to avoid: `passionate`, `driven`, `detail-oriented`, `results-oriented`, `team player`, `hit the ground running`. Guidance for the writer, not enforced by lint (D48).
 - Failure states speak in the interface's voice. The 404 is `ENOENT` with a real errno table, not "Oops!".
 
 ---
@@ -452,9 +452,16 @@ Every fact on the site reads from this file. Nothing is hardcoded in a component
 }
 ```
 
-Two lint rules (P1-06):
-1. Fail the build if any `.mdx` contains a bare `$`+digits or a percentage that does not exist in `profile.json`.
-2. Fail the build if any file contains the strings `citizenship`, `passport`, `visa`, `green card`, `work authorization`, or a banned adjective from §4.5. This enforces D2 mechanically rather than relying on memory.
+One lint rule (P1-06, D48): fail the build if anything outside `src/profile.ts`
+imports `src/data/profile.json`, which would bypass the Zod schema and the rule
+that a non-public repo carries no link (D47).
+
+The fact-checking and banned-word rules originally specified here were cut (D48).
+They were guidance for whoever is writing, not conditions a build should fail on —
+`driven` is banned by §4.5 and also the correct word for an *event-driven*
+integration. **D2 is unaffected as a constraint and still absolute; what it loses
+is mechanical enforcement.** Nobody should read D2's "a build lint fails on…" and
+expect that lint to exist.
 
 ---
 
@@ -479,8 +486,8 @@ Estimates are focused hours for one competent agent or one focused Vitor session
 **P1-05 — `profile.json` + typed accessor.**
 *AC:* Zod-validated at build; one exported helper; components cannot import the raw JSON.
 
-**P1-06 — Lint rules.** Both rules from §8.
-*AC:* CI fails on a planted fact violation and on a planted `passport`.
+**P1-06 — Lint rule.** The one rule from §8 (D48).
+*AC:* CI fails on a planted raw import of `profile.json`.
 
 **P1-07 — Résumé CI.** Action compiles `resume_general_swe.tex` → `public/resume.pdf` (D10).
 *AC:* PDF served at `/resume.pdf`; build fails loudly on LaTeX errors.
