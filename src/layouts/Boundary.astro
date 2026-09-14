@@ -1,0 +1,121 @@
+---
+// The two-track grid from plan §4.3. All layout CSS lives here, including the
+// rules for .kernel and .row, so there is one place to look when the boundary
+// misbehaves.
+import Base from './Base.astro';
+
+interface Props {
+  title: string;
+  noindex?: boolean;
+}
+
+const { title, noindex = false } = Astro.props;
+---
+
+<Base title={title} noindex={noindex}>
+  <div class="boundary">
+    <slot />
+  </div>
+</Base>
+
+<style>
+  .boundary {
+    --gutter: 2rem;
+    --pad: 1.5rem;
+
+    box-sizing: border-box;
+    max-width: calc(
+      var(--measure-kernel) + var(--gutter) + var(--measure-prose) + 2 * var(--pad)
+    );
+    margin-inline: auto;
+    padding: 3rem var(--pad);
+
+    /* The rule. One gradient on one element, so it spans the whole document and
+       cannot develop gaps between sections — a border on a kernel column would
+       produce one segment per section and vanish wherever a section has no
+       kernel content. Origin is the padding box, so --pad is part of the offset
+       and the line covers the vertical padding too.
+
+       Sits at the kernel track's right edge, not mid-gutter, so an ink block
+       presses flush against it. Mid-gutter put the block edge and the rule 16px
+       apart, reading as two competing divisions instead of one boundary (D45). */
+    background-image: linear-gradient(var(--boundary), var(--boundary));
+    background-repeat: no-repeat;
+    background-size: 1px 100%;
+    background-position: calc(var(--pad) + var(--measure-kernel)) 0;
+  }
+
+  /* Ordinary content sits in the prose track, indented past the rule. No grid
+     is involved, so nothing can be pulled out of place by auto-placement. */
+  .boundary > :global(*) {
+    margin-inline-start: calc(var(--measure-kernel) + var(--gutter));
+    max-width: var(--measure-prose);
+  }
+
+  .boundary > :global(* + *) {
+    margin-block-start: 1.5rem;
+  }
+
+  /* A .row pairs one kernel block with its prose on a single line. Pairing is
+     explicit: each row is its own grid. Sharing one grid across all children
+     looks simpler and is wrong — a prose block with no kernel beside it shifts
+     every later pairing down a row. */
+  .boundary > :global(.row) {
+    display: grid;
+    grid-template-columns:
+      var(--measure-kernel)
+      var(--gutter)
+      minmax(0, var(--measure-prose));
+    margin-inline-start: 0;
+    max-width: none;
+  }
+
+  .boundary :global(.row > *) {
+    grid-column: 3;
+    min-width: 0;
+    margin: 0;
+  }
+
+  /* Ink wherever it appears — the ground, not just the typeface, is what makes
+     kernel space legible as machine space (D44). Colour comes from tokens.css. */
+  .boundary :global(.kernel) {
+    grid-column: 1;
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+    font-family: var(--font-machine);
+    /* --size-m, not --size-s: Commit Mono's x-height is 0.540 against
+       Newsreader's 0.426, so 16px of mono optically matches 21px of prose (D39). */
+    font-size: var(--size-m);
+    line-height: 1.4;
+  }
+
+  /* Below 960px the tracks stack and the ink blocks widen to full-bleed bands.
+     The band edge is the horizontal rule §4.3 asks for — a border here would be
+     ink on ink, drawing nothing. */
+  @media (max-width: 59.9375em) {
+    .boundary {
+      background-image: none;
+    }
+
+    .boundary > :global(*) {
+      margin-inline-start: 0;
+    }
+
+    .boundary > :global(.row) {
+      display: block;
+      max-width: none;
+    }
+
+    /* The measure survives the stack — only the ink bands go full-bleed. */
+    .boundary :global(.row > *) {
+      max-width: var(--measure-prose);
+    }
+
+    .boundary :global(.kernel) {
+      max-width: none;
+      margin-inline: calc(-1 * var(--pad));
+      margin-block-end: 1.5rem;
+      padding: 1rem var(--pad);
+    }
+  }
+</style>

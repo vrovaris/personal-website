@@ -1,19 +1,13 @@
 ---
 // Placeholder until P2-01. Exists so the deploy path is proven on day one.
-// The noindex below comes out at launch. Until then it keeps this page, and
-// every preview deploy, out of search results while the repo is private (D32).
+// noindex comes out at launch (Q10).
+// Deliberately has no kernel block: the rule must still run unbroken when a
+// page has nothing in the narrow track.
+import Boundary from '../layouts/Boundary.astro';
+import { profile } from '../profile';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>vrovaris.com</title>
-    <meta name="robots" content="noindex" />
-  </head>
-  <body>
-    <h1>vrovaris.com</h1>
-    <p>Under construction.</p>
-  </body>
-</html>
+<Boundary title={profile.name} noindex>
+  <h1>vrovaris.com</h1>
+  <p>Under construction.</p>
+</Boundary>

@@ -1,0 +1,121 @@
+---
+// Internal reference for the design system. Permanently noindex: it is not part
+// of the site's content and no sitemap exists yet to exclude it from (P1-02).
+import Base from '../layouts/Base.astro';
+import Boundary from '../layouts/Boundary.astro';
+
+const scale = [
+  ['3xl', '4.25rem'],
+  ['2xl', '2.625rem'],
+  ['xl', '1.75rem'],
+  ['l', '1.3125rem'],
+  ['m', '1rem'],
+  ['s', '0.9375rem'],
+  ['xs', '0.8125rem'],
+];
+
+const states = [
+  ['--state-allowed', 'allowed'],
+  ['--state-quiet', 'quiet'],
+  ['--state-trapped', 'trapped'],
+  ['--state-denied', 'denied'],
+];
+---
+
+<Base title="Styleguide — vrovaris.com" noindex>
+  <main>
+    <h1>Styleguide</h1>
+
+    <h2>Type scale</h2>
+    {
+      scale.map(([name, size]) => (
+        <p class="specimen" style={`font-size: var(--size-${name})`}>
+          <span class="label">{name} {size}</span>
+          Vitor chased a fifty million dollar difference.
+        </p>
+      ))
+    }
+
+    <h2>Weight axis, 200 to 800</h2>
+    <p class="axis">
+      {[200, 400, 600, 800].map((w) => <span style={`font-weight: ${w}`}>Newsreader {w}</span>)}
+    </p>
+
+    <h2>Machine voice</h2>
+    <p class="machine">Aug 2026<br />→ present</p>
+    <p class="machine">371 notes/mo<br />$140M flow</p>
+
+    <h2>State colours — machine space only</h2>
+    <p class="note">
+      Four saturated colours that are legible and tellable apart do not fit on
+      the light ground: 4.5:1 against near-white forces them all to one
+      lightness. They live here instead (D41).
+    </p>
+    <div class="ground-machine swatches">
+      {states.map(([token, name]) => (
+        <p class="machine" style={`color: var(${token})`}>{name}</p>
+      ))}
+    </div>
+
+    <h2>Prose colours — user space</h2>
+    <div class="swatches">
+      <p>body text, --fg-user</p>
+      <p style="color: var(--fg-muted)">secondary text, --fg-muted</p>
+    </div>
+
+    <h2>Boundary layout</h2>
+    <p class="note">
+      Resize to cross 960px. Above it, two tracks with a continuous rule; below,
+      the tracks stack and kernel blocks become full-bleed ink bands. The rule is
+      one gradient on the grid container, so it cannot break between sections.
+    </p>
+
+    <h2>Focus</h2>
+    <p><a href="/">Tab to this link to see the focus ring.</a></p>
+  </main>
+</Base>
+
+<style>
+  main {
+    max-width: var(--measure-prose);
+    padding: 2rem 1rem;
+  }
+
+  h2 {
+    font-family: var(--font-machine);
+    font-size: var(--size-s);
+    font-weight: 400;
+    margin-top: 3rem;
+  }
+
+  .specimen,
+  .axis span {
+    margin: 0.5rem 0;
+  }
+
+  .axis span {
+    display: block;
+    font-size: var(--size-l);
+  }
+
+  .label,
+  .machine {
+    font-family: var(--font-machine);
+    font-size: var(--size-xs);
+  }
+
+  .label {
+    display: block;
+    color: var(--fg-muted);
+  }
+
+  .swatches {
+    padding: 1rem;
+  }
+
+  .note {
+    color: var(--fg-muted);
+    font-size: var(--size-s);
+    max-width: 46ch;
+  }
+</style>

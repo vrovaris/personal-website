@@ -43,7 +43,7 @@ Consequences: …
 | D7 | Personal content undecided | open, blocks P2-04/P2-05 |
 | D8 | Budget ceiling $20/year | active |
 | D9 | No graduate-school signaling in v1 | active |
-| D10 | `/resume.pdf` serves the general SWE variant | active |
+| D10 | `/resume.pdf` serves the general SWE variant | active; filename amended by D49 |
 | D11 | Instructor ruling: do not post the projects; writing is permitted | active, narrowed by D17 |
 | D12 | New grammar is hand-written recursive descent in C | active |
 | D13 | CS 307 / CS 407 projects publishable when taken | active, not yet actionable |
@@ -68,9 +68,23 @@ Consequences: …
 | D32 | Repo private until launch; docs under `docs/` | active |
 | D33 | Symlinks are tracked; machine-local Claude state is not | active |
 | D34 | Font budget raised to 150KB; both Newsreader axes kept | active, amends plan §10 and P1-02 |
-| D35 | Astro 7 rather than Astro 5; adapter and wrangler follow | active, amends plan §6 and P1-01 |
+| D35 | Astro 7 rather than Astro 5; adapter and wrangler follow | active; collections item closed by D46 |
+| D36 | State colours revalued per ground, scoped by selector | colours superseded by D41; scoping mechanism active |
+| D37 | Commit Mono is MIT; licences ship; masters stay untracked | active, answers Q7 |
+| D38 | User-ground trapped and quiet revised for mutual distinguishability | superseded by D40, then D41 |
+| D39 | Prose body is --size-l; scale itself unchanged | active, clarifies plan §4.2 |
+| D40 | Allowed is green; denied saturated; quiet cool; blue is structure | colours superseded by D41; focus rule active |
+| D41 | State colours exist only in machine space | active, supersedes colours in D36/D38/D40 |
+| D42 | User ground is warm plaster, not cool white | active, amends plan §4.1 |
+| D43 | 68ch means 68 characters, not the CSS ch unit | active, clarifies plan §4.2 and §4.3 |
+| D44 | Kernel blocks are ink at every width, not just mobile | active, amends plan §4.3 |
+| D45 | Rule sits flush at the kernel edge, not mid-gutter | active, refines D44 |
+| D46 | Locale in the directory; getLocalised is the only accessor | active, implements P1-04 |
+| D47 | profile.json owns repo links; non-public repos carry none | active, supersedes point 4 of D46 |
+| D48 | Only lint rule is the raw-import check; other two cut | active, supersedes plan §8 rules and D2 enforcement |
+| D49 | CI compiles resume_web.tex and opens a PR; PDF committed | active, amends D10 and answers Q6 |
 
-**Next free ID: D36.**
+**Next free ID: D50.**
 
 ---
 
@@ -425,3 +439,176 @@ Consequences:
 5. **The adapter generates a `wrangler.json` declaring a `SESSION` KV binding and an `IMAGES` binding.** Neither exists in the account and neither is used while every route is static. If the first deploy fails on a missing binding, this is why.
 6. **`esbuild` and `workerd` need their install scripts approved**, recorded in `pnpm-workspace.yaml` so a fresh clone and CI do not hit the same prompt. `workerd` is Cloudflare's runtime and local preview does not work without it.
 7. **Node is pinned to >=22.12.0**, Astro 7's floor, in `package.json` and in CI. Cloudflare Pages needs `NODE_VERSION` set to match.
+
+
+---
+
+## 2026-09-12 — Contrast and font licensing
+
+**D36 — State colours carry a different value on each ground, scoped by selector rather than renamed.** *(2026-09-12 · decided by: Vitor · active · amends plan §4.1)*
+
+Reasoning: measured against the two grounds, four of §4.1's colours fail the 4.5:1 floor that plan §10 calls non-negotiable. §10 anticipated the wrong pair — it warned about ochre and brick on plaster; brick on plaster passes at 5.74, and the two worst failures are on the ink ground, which §10 does not mention at all. `--state-allowed` on the kernel track is the one that matters most, since the gate uses it constantly.
+
+| | on plaster | on ink |
+|---|---|---|
+| azulejo `#1F5AA8` | 5.91 | **2.56** |
+| ochre `#C9873A` | **2.60** | 5.82 |
+| brick `#A8341F` | 5.74 | **2.64** |
+| bisque `#DCD3C4` | **1.29** | 11.75 |
+
+Corrected values, same hue, moved only far enough to clear 4.5:1: `--ochre-deep #946229` (4.51) and `--bisque-deep #7D6A4A` (4.52) for the user ground; `--azulejo-light #3F82DC` (4.51) and `--brick-light #DC573F` (4.55) for the machine ground.
+
+Rejected: distinct token names per ground (`--state-allowed-on-machine`). Explicit, but it pushes the decision into every component and doubles what the two-track layout in P1-03 has to reason about.
+
+Consequences: `:root` holds the user-ground values and a single `.ground-machine` selector revalues the same four names, so a component writes `--state-allowed` and is correct on either side of the boundary. The corrected hexes are palette entries in `tokens.css`, so "zero raw hex outside the palette block" still holds. Dark mode (D5) stays a swap of which selector carries which set.
+
+**D37 — Commit Mono is MIT, not OFL; both licences ship with the fonts and the unsubsetted masters stay out of the repository.** *(2026-09-12 · decided by: recommendation, taken as the default · active · answers Q7, closes the open question in plan §4.2)*
+
+Reasoning: plan §4.2 carried "confirm current license at download" against Commit Mono and nobody had. Its repository licence file is MIT, copyright 2023 Eigil Nikolajsen — not OFL, which is what a font is usually assumed to be. Newsreader is OFL 1.1, copyright 2020 The Newsreader Project Authors, read from the font's own name table rather than assumed. Both licences require their notice to travel with the files, and neither was present.
+
+Consequences:
+1. `public/fonts/OFL.txt` and `public/fonts/LICENSE-commit-mono.txt` ship alongside the fonts. Both were fetched from their authoritative sources, not reproduced from memory.
+2. `public/fonts/PROVENANCE.md` records source, version, licence, and the exact subsetting commands, per D34 consequence 5.
+3. **The unsubsetted originals live in `fonts-src/`, which is gitignored.** Subsetting overwrites what is in `public/fonts/`, so without this the only copies of the masters would have been destroyed the first time the subset ran. They are Vitor's files and he holds the masters.
+4. `/colophon` (P2-06) credits both faces and links these files.
+
+
+---
+
+## 2026-09-12 — Revising the user-ground colours
+
+**D38 — The user-ground values for `--state-trapped` and `--state-quiet` are replaced; contrast alone was the wrong target.** *(2026-09-12 · decided by: Vitor, from review · active · supersedes the user-ground half of D36; D36's machine-ground values and its scoping mechanism stand)*
+
+Reasoning: D36 corrected four colours by moving each the minimum distance needed to clear 4.5:1 while holding its hue. On the ink ground that worked. On the plaster ground it produced `#946229` and `#7D6A4A` — two mid-browns that clear the contrast floor against the *background* and fail against *each other*. Vitor called them on sight; measured, they sit at ΔE 22.3, under the ~25 where two colours stop being tellable apart. A state colour that cannot be distinguished from another state colour does not do its job, and no contrast ratio detects that, because the ratio only ever looks at one pair.
+
+| | old | new | contrast | ΔE to the other |
+|---|---|---|---|---|
+| `--state-trapped` | `#946229` | **`#8A5A15`** | 4.51 → **5.13** | 22.3 → **42.7** |
+| `--state-quiet` | `#7D6A4A` | **`#6B6560`** | 4.52 → **4.99** | " | " |
+
+The separation comes from chroma, not lightness: trapped stays saturated ochre (chroma 47), quiet drops to near-neutral warm grey (chroma 4). One is orange, one is grey, and no amount of squinting merges them. Both also gained contrast, which answers the second half of the report — at 4.51 the old pair sat exactly on the floor, which is a pass and still hard to read.
+
+Rejected: a search that maximised perceptual distance, which drove trapped to `#4A351C` at 10:1 — excellent numbers, no longer recognisably ochre. Optimising a colour system on one metric is what produced the defect in the first place.
+
+Consequences:
+1. The palette entry `--bisque-deep` is renamed **`--warm-grey`**, because `#6B6560` is no longer bisque in any meaningful sense and a name that lies is worse than a new name. `--bisque` itself is untouched and still carries `--state-quiet` on the machine ground, where it measures 11.75.
+2. **Contrast is a floor, not the specification.** Any future palette change checks each colour against its ground *and* against the other states on that ground. ΔE ≥ 25 is the working threshold.
+3. D36's mechanism — `:root` for user ground, `.ground-machine` revaluing the same names — is unchanged and is what made this a two-value edit.
+
+**D39 — Prose body is `--size-l` (1.3125rem), not `--size-m`.** *(2026-09-12 · decided by: recommendation after Vitor reported the body text reading small · active · clarifies plan §4.2, does not change the scale)*
+Reasoning: §4.2's scale is sound but says nothing about which step body prose takes, and 1rem was the obvious-looking default. Newsreader's x-height is 0.4260em where a typical text face sits near 0.50, so at 16px it renders a 6.8px x-height against Georgia's 7.7px — a fifth smaller than the same nominal size in almost any other face. `--size-l` gives 8.95px, equivalent to a 17px sans, which is ordinary editorial prose sizing at a 68ch measure.
+Rejected: adding 1.125rem to the scale, which matches Georgia-at-16px exactly but amends §4.2 to solve something an existing step already solves.
+Consequences: the seven scale values in §4.2 are unchanged. Machine voice set beside body prose uses `--size-m`, not `--size-s` — Commit Mono's x-height is 0.540, so 16px of it optically matches 21px of Newsreader. Sizing the two families by their nominal size rather than their x-height is what makes a serif-plus-mono pairing look wrong.
+
+**D40 — Allowed becomes green, denied gains saturation, quiet goes cool; blue is structure only.** *(2026-09-12 · decided by: Vitor, from review · active · supersedes the colour values in D36 and D38; plan §4.1's palette block is amended)*
+Reasoning: three separate findings from looking at the rendered styleguide. `--state-allowed` was azulejo, and blue state on a deep slate-navy ground reads as blue-on-blue no matter what the ratio says — 4.51:1 was a passing number for an unusable pairing. Moving allowed to green also resolves a tension already in §4.1, which says blue and ink carry *structure*: blue was doing double duty as structure and as a state, and now does neither job ambiguously. Separately, brick was not saturated enough to read as an alarm, and the revised quiet from D38 still sat too close to ochre — both are warm mid-tones, and dropping chroma alone was not enough.
+
+| token | ground | was | now | contrast |
+|---|---|---|---|---|
+| `--state-allowed` | plaster | `#1F5AA8` | `#17703C` | 5.91 → 5.33 |
+| `--state-allowed` | ink | `#3F82DC` | `#4CC17E` | 2.56 → **7.67** |
+| `--state-denied` | plaster | `#A8341F` | `#B82508` | 5.74 → 5.51 |
+| `--state-denied` | ink | `#DC573F` | `#F2603F` | 4.55 → 5.41 |
+| `--state-quiet` | plaster | `#6B6560` | `#566070` | 4.99 → 5.52 |
+
+Separation could not come from brightening ochre — `#A0690A` reads better but falls to 4.03:1, under the floor. It came from moving quiet to a cool slate, opposing ochre in hue rather than only in chroma. Worst pair on either ground is now ΔE 42.9 (plaster) and 36.2 (ink), against 22.3 when the defect was reported.
+
+Rejected: keeping allowed blue and deepening the ground instead, which would have broken §4.1's ink.
+
+Consequences:
+1. New palette entries `--verdigris #17703C` and `--verdigris-light #4CC17E`; `--warm-grey` from D38 is renamed `--slate` and revalued; `--brick` is revalued in the palette block itself rather than gaining a variant.
+2. **`--azulejo` no longer backs any `--state-*` token.** It now carries `--focus`, a new semantic name, so the focus ring stays blue and structural on both grounds. Blue is structure, exactly as §4.1 says.
+3. Plan §4.1's palette block no longer matches `tokens.css` and is amended by this entry. The rule in §4.1 that "ochre and brick appear only where something is genuinely trapped or denied" is unchanged.
+
+**D41 — State colours exist only in machine space.** *(2026-09-13 · decided by: Vitor · active · supersedes the colour values in D36, D38 and D40; amends plan §4.1)*
+Reasoning: three attempts to make four state colours work on the plaster ground all failed on Vitor's eye, and the third attempt showed why it was never going to work. Requiring 4.5:1 against a near-white ground *is* a lightness constraint, so four colours tuned to clear it all land at the same lightness — measured, they sat at L\* 40 to 42, and small text is read by lightness before hue. The usable band on plaster is L\* 9 to 46, 37 points for four colours; on ink it is 54 to 100, 46 points, and a dark ground carries saturation far better. Vitor had already said the machine-ground set looked right.
+
+This also resolves a concept problem rather than a rendering one. §4.1 says ochre and brick appear only where something is trapped or denied — those are kernel states. The gate is a kernel-space interactive. Putting machine state exclusively in machine space sharpens D1's boundary instead of fighting it.
+
+Final values, all on the ink ground, spread deliberately across the lightness band rather than bunched at the contrast floor:
+
+| token | value | contrast | L\* |
+|---|---|---|---|
+| `--state-denied` | `#F2603F` | 5.41 | 59.5 |
+| `--state-trapped` | `#D89D58` | 7.37 | 69.1 |
+| `--state-allowed` | `#66D696` | 9.65 | 77.9 |
+| `--state-quiet` | `#E4DCCF` | 12.81 | 88.1 |
+
+Worst pair: ΔE 41.0, 8.9 L\* apart. The previous machine-ground set would have shipped trapped and denied 2.2 L\* apart — orange against red at identical value, the worst case for red-green colour blindness — which contrast ratios and ΔE both passed.
+
+Rejected: spreading lightness on the plaster ground (option A), which reached a 15-point gap but turned ochre into a dark brown and left green and red at the same value.
+
+Consequences:
+1. **`--state-*` is defined only inside `.ground-machine`.** Referencing one on the user ground resolves to nothing and breaks visibly. That is deliberate — it caught a wrong reference in the styleguide immediately.
+2. `.ground-machine` now sets ground, foreground, focus and the four states together: one class means "you are in machine space".
+3. The user ground keeps `--fg-user`, `--fg-muted` (`#566070`, 5.52:1) and `--focus`. Prose does not need state colour.
+4. **Contrast is a floor; lightness spread and ΔE are the specification.** Every future palette change checks all three. Two defects reached Vitor because only the first was checked.
+5. Per-ground variants remain only for `--focus`, so blue stays structural on both grounds (D40).
+
+**D42 — The user ground is warm plaster `#EBE5D8`, not the cool white `#EDEFF2`.** *(2026-09-13 · decided by: Vitor · active · amends plan §4.1)*
+Reasoning: Vitor found the original ground too intense to read against. It was a cool white — measured, L\* 94.4 with a b\* of −1.7, meaning slightly blue. The replacement is L\* 91.1 with b\* +7.0: three points less bright and decisively warm. It is also closer to what the name always claimed, since lime plaster is warm and the cool white was the odd part.
+Rejected: `#F3EFE7` (warmer but no less bright, so it would not have fixed the complaint) and `#E7E0D2` (deeper, but `--fg-muted` falls to 4.84:1, close enough to the floor to leave no margin).
+Consequences: every user-ground foreground re-verified — `--fg-user` 13.89:1, `--fg-muted` 5.07:1, `--focus` 5.42:1, all passing. No state colour is affected, since D41 confined those to the ink ground. Dark mode (D5) inverts the grounds, so the warm plaster becomes the machine ground there and its pairings get checked again at that point.
+
+**D43 — `68ch` is not a 68-character measure; the prose track is `27.75em`.** *(2026-09-13 · decided by: recommendation, taken as the default · active · clarifies plan §4.2 and §4.3)*
+Reasoning: §4.2 and §4.3 both specify "max 68ch" for prose, meaning a 68-character line. The CSS `ch` unit is not that — it is the advance width of the digit "0", which in Newsreader is 0.5500em while the frequency-weighted average letter is 0.4081em. Taken literally, `68ch` sets a 785px line carrying about **92 characters**, a third past the measure the plan is asking for and outside the 45-75 range the number was chosen from.
+Consequences: `--measure-prose: 27.75em` — 68 × 0.4081em — giving 583px at the 21px body size and a genuine 68-character line. Being in `em` rather than `px`, it scales if the prose size changes. The same trap applies to the 18ch kernel track, already avoided in P1-03 for a different reason: `ch` on the grid container resolves against the prose font, not the mono one, so `--measure-kernel` is written as `calc(18 * 0.6 * var(--size-m))` using Commit Mono's measured 0.600em advance.
+Note for anyone reading §4.2 later: "68ch" in the plan means 68 characters, not the CSS unit. The plan is patched to say so.
+
+**D44 — Kernel blocks carry the ink ground on desktop too, not only in the mobile stack.** *(2026-09-13 · decided by: Vitor, from review · active · amends plan §4.3)*
+Reasoning: §4.3 says kernel blocks "become" ink bands below 960px, which reads as *not* ink above it, and that is how P1-03 was first built — the desktop kernel track was mono type on plaster, separated by the 1px rule. Rendered, the concept only survived on phones: Vitor reported the dark ground disappearing on a normal Mac screen. D1 calls the two-track layout load-bearing, and the boundary between user space and machine space is the site's identity; having it visible only at the narrowest viewport inverts which screen the design works on.
+Rejected: filling the entire kernel track with ink as a continuous column. It states the territory idea most strongly and would have made the whole track machine ground, but it replaces §4.3's "1px rule is the most recognizable feature" with a dark column, and on a wide screen the centred document places that column some 300px in from the screen edge rather than anchored to it — a floating stripe, not a territory. Also rejected: anchoring that column to the viewport edge, which fixes the floating but abandons the centred layout.
+Consequences:
+1. `.kernel` carries `--ground-machine` at every width. Only its size changes across the breakpoint: a block in the narrow track above 960px, a full-bleed band below it.
+2. **`.kernel` shares the machine-ground token definition with `.ground-machine` in `tokens.css` rather than copying it**, so D41's state colours resolve inside a kernel block. One definition of what machine ground means; the layout keeps placement and type.
+3. The 1px rule survives unchanged, so §4.3's headline feature is intact and now separates two visible grounds rather than two typefaces.
+4. The mobile `border-block` is removed as dead weight — it drew ink on ink. The band's own edge is the horizontal rule §4.3 asks for.
+5. Text in a kernel block is `--fg-machine` on `--ground-machine`, 13.89:1. A focus ring inside one is `--azulejo-light`, 4.51:1, above the 3:1 floor for non-text.
+
+**D45 — The rule sits at the kernel track's edge, flush against the ink blocks, not mid-gutter.** *(2026-09-13 · decided by: Vitor, from review · active · refines D44)*
+Reasoning: once kernel blocks became ink (D44), the 1px rule sat 16px away from each block's right edge, so every annotated row showed two parallel vertical divisions doing the same job. Vitor read it as odd and asked whether the rule was still needed at all. It is, but not where it was.
+The rule earns its place in the gaps, not beside the blocks. Where a kernel block exists, the block edge already divides the tracks. Where none exists — a page with no kernel content, or a long run of prose between annotations — the rule is the only thing marking that there are two territories, and D1 makes that boundary the site's identity. Deleting it would leave "prose with dark blocks to the left of it", which is a common pattern and not this one.
+Rejected: removing the rule and letting the blocks imply the boundary by sharing a right edge. Cheaper, and wrong on exactly the pages with sparse kernel content. Also rejected: dropping the blocks and returning to type-only kernel space, which is what D44 was raised to fix.
+Consequences: `background-position` moves from `--pad + --measure-kernel + --gutter / 2` to `--pad + --measure-kernel`. Blocks now press flush against the rule and read as one boundary; the full 32px gutter falls between the rule and the prose. The rule stays continuous and full-height, so §4.3's headline feature is unchanged in behaviour, only in placement.
+
+**D46 — Locale lives in the directory, not in the schema, and `getLocalised()` is the only sanctioned way to list entries.** *(2026-09-13 · decided by: recommendation, approved by Vitor · active · implements P1-04, closes the collections half of D35)*
+Reasoning: P1-04's acceptance criteria are that adding a `pt/` file later needs no schema change and that no dead `/pt/` routes ship. A `locale` field in frontmatter satisfies neither cleanly — it is part of the schema by definition, every author has to set it, and it can disagree with the directory the file sits in. Folding the locale into the entry id removes the possibility: `src/content/work/en/x.mdx` loads as `en/x`, and the schema never mentions locale at all.
+Verified rather than assumed, with a temporary probe that was deleted afterwards: with both `en/probe` and `pt/probe` present, `getCollection('work')` returned both and `getLocalised('work')` returned only the `en` entry. A missing required field failed the build and named the field.
+Consequences:
+1. `glob({ pattern: '**/*.mdx', base: './src/content/<name>' })` for all four collections, so the locale directory becomes the id prefix.
+2. **Routes list entries through `getLocalised()` in `src/content.ts`, never `getCollection` directly.** That helper is what keeps a stray `pt/` file from rendering; calling `getCollection` in a route is the way this rule gets broken.
+3. Schema fields come from plan §7 and nothing more — no `draft` or `order` until a Phase 2 page needs one.
+4. `things.repo` is optional and must stay absent for the shell entry: no repository link, ever (D3, D26).
+5. **Astro 7 API specifics**, none of which match the plan's wording: the config is `src/content.config.ts`, loaders come from `astro/loaders`, `z` from `astro:content` is deprecated in favour of `astro/zod`, and `z.string().url()` is deprecated in favour of `z.url()`. Using the plan's assumed API produces eight deprecation warnings.
+6. Empty collections emit one `glob-loader` warning each until Phase 2 adds content. Warnings, not errors; they disappear as entries land.
+
+**D47 — `profile.json` owns repository links, and a non-public repo may not carry one.** *(2026-09-13 · decided by: recommendation, taken as the default · active · supersedes point 4 of D46)*
+Reasoning: P1-04 gave the `things` content collection an optional `repo` field, and plan §8 gives `profile.json` a `things[].repo` plus `repoPublic`. Two homes for the same fact is two places a stale or private URL can live, and §8 is explicit that every fact reads from `profile.json`. The collection keeps prose; the profile keeps facts.
+Separately, `repoPublic` was documentation until it was enforced. A component rendering `thing.repo` without checking the flag would publish a link to a private repository — the exact failure D21 exists to prevent, arriving through a forgotten `if` rather than a bad `git add`.
+Consequences:
+1. The `repo` field is removed from the `things` collection schema. Pages join a content entry to its profile record by slug.
+2. `src/profile.ts` carries a Zod `.refine()`: a thing with `repoPublic: false` must have `repo: null`. Verified by planting a link on the shell entry — the build fails with `a non-public repo must have repo: null` and the offending index. The shell's is null permanently (D3, D21, D26).
+3. **The Zod parse only runs when something imports `src/profile.ts`.** Nothing did, which made "validated at build" vacuous, so `index.astro` now takes its page title from `profile.name`. Any page importing the module keeps the guarantee live; the first Phase 2 page makes it unremarkable.
+4. `this-site` ships `repo: null, repoPublic: false` because `personal-website` is private until launch (D32).
+
+**D48 — The fact-checking and banned-word lint rules are cut; the only lint rule is the raw-import check.** *(2026-09-13 · decided by: Vitor · active · supersedes the two rules in plan §8, the enforcement clause of D2, and the "enforced by lint" claim in §4.5)*
+Reasoning: Vitor's ruling on seeing what the two rules would actually do — they are guidance for whoever is writing, not conditions a build should fail on. The detail that made the case: §4.5 bans `driven`, and his own BTG work is an **event-driven** integration, so the rule would have rejected the correct technical term for the thing he built. The fact-checking rule had a matching problem of the same shape, needing code fences stripped to avoid failing on every `$` prompt and `printf("%d")` on a site whose subjects are a shell and a parser.
+**What this costs, recorded deliberately:** D2 remains a hard constraint — citizenship, passports, visas, immigration and work authorisation are never mentioned, anywhere. Its stated consequence was "a build lint fails on" those words, precisely so the rule would not depend on memory. That machine check is gone, so D2 now rests on discipline: the author's, and every agent's. The constraint did not weaken; its enforcement did. Anyone reading D2 later should know the lint it describes does not exist.
+Rejected: keeping the banned-word rule for the D2 words only and dropping the §4.5 adjectives. It would have preserved the mechanical guarantee on the constraint that actually matters, but Vitor's call covered both sets, and a lint scanning for those words has its own problem — `docs/DECISIONS.md` is full of them, because D2 is about them.
+Consequences:
+1. `tools/lint.mjs` implements one rule: nothing outside `src/profile.ts` may import `src/data/profile.json`. Verified by planting an import in a page — the build exits 1 and names file and line.
+2. `pnpm build` runs `node tools/lint.mjs && astro check && astro build`, so CI and local builds fail identically.
+3. P1-06's acceptance criteria change from "CI fails on a planted fact violation and on a planted `passport`" to "CI fails on a planted raw import of `profile.json`".
+4. Plan §8, §4.5 and §9 are patched to match. This closes the enforcement gap flagged in P1-05's walkthrough.
+
+**D49 — CI compiles `resume/resume_web.tex` and opens a pull request; the PDF is committed.** *(2026-09-13 · decided by: Vitor · active · amends D10's filename, answers Q6)*
+Reasoning on the filename: D10 named the CI input `resume_general_swe.tex`, written before D31 split a redacted web variant from the full one. The file that exists is `resume/resume_web.tex`, and `_web` encodes a safety property — this is the variant with the phone number removed — which is worth more in a public repository than matching a name chosen for a different reason. D10's choice of *which résumé* is unchanged: the general SWE variant is what `/resume.pdf` serves.
+Reasoning on the architecture: the site deploys through Cloudflare Workers Builds (D35), whose container has no LaTeX, so the PDF cannot be produced at deploy time. It has to exist in the repository before Cloudflare builds. There is also no LaTeX toolchain on Vitor's machine, so "compile locally and commit" is not available either.
+Rejected: moving deployment into GitHub Actions so the PDF never enters git. Cleaner in principle — the artifact cannot go stale and no binary enters history — but it costs a `CLOUDFLARE_API_TOKEN` secret, abandons the Cloudflare Git integration already working, and makes PR previews our problem instead of Cloudflare's. For a file that changes a few times a year, the moving parts cost more than the tidiness is worth.
+Consequences:
+1. `.github/workflows/resume.yml` runs on pushes to `main` touching `resume/**`, and on manual dispatch.
+2. **It opens a pull request rather than pushing to `main`.** Vitor commits by hand and nothing lands without him merging.
+3. `public/resume.pdf` is committed. Roughly 100KB per résumé edit in history — D31's warning about committed binaries is aimed at a shell binary rebuilt constantly, which is a different scale.
+4. **The LaTeX action is pinned to commit `6549dc21` (v4.1.0), not the tag.** It runs with write access to the repository and a tag can be moved to point at anything.
+5. The action's default `args` are used unchanged; they already carry `-halt-on-error -interaction=nonstopmode -file-line-error`, so a LaTeX error fails the job instead of publishing a half-typeset PDF.
+6. The same `.tex` is read directly, not compiled, by `tools/tex-to-ansi` for the `curl` résumé endpoint (plan §6). One source, two outputs.

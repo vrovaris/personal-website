@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
-    "preview": "astro preview"
+    "build": "node tools/lint.mjs && astro check && astro build",
+    "preview": "astro preview",
+    "lint": "node tools/lint.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.3.1",
+    "@astrojs/mdx": "^8.0.1",
     "@astrojs/react": "^6.0.5",
     "astro": "^7.3.2",
     "react": "^19.3.0",

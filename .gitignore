@@ -42,6 +42,11 @@ pnpm-debug.log*
 .Spotlight-V100
 .Trashes
 
+# ---- font masters (D34) ----
+# Unsubsetted originals. public/fonts/ carries the subsets that actually ship;
+# these are the sources they are cut from and are too heavy to serve.
+fonts-src/
+
 # ---- personal data (D31) ----
 # Only the web résumé variant belongs here, and it carries no phone number.
 resume_general_swe_with_shell.tex

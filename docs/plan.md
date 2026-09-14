@@ -97,7 +97,7 @@ The grid motif for the interactive pieces — a panel of cells, some permitted, 
 /now                  What he's doing this month. nownownow.com convention.
 /colophon             How the site is built, with real measured numbers.
 /guestbook            Visitor messages.
-/resume.pdf           Built in CI from resume_general_swe.tex.
+/resume.pdf           Built in CI from resume/resume_web.tex (D49).
 /404                  ENOENT.
 ```
 
@@ -116,25 +116,48 @@ Semantic names, so the later dark mode is a swap and not a refactor (D5). Raw va
 ```css
 :root {
   /* palette — referenced only in this block */
-  --plaster:  #EDEFF2;  /* cool white */
+  --plaster:  #EBE5D8;  /* warm plaster, not paper white (D42) */
   --ink:      #101A2B;  /* deep slate-navy */
-  --azulejo:  #1F5AA8;  /* Bulcão blue */
-  --bisque:   #DCD3C4;  /* warm neutral */
-  --ochre:    #C9873A;
-  --brick:    #A8341F;
+  --azulejo:  #1F5AA8;  /* Bulcão blue — structure only, never a state (D40) */
+  --azulejo-light: #3F82DC;  /* the same blue, cut for the ink ground */
+  --slate:    #566070;  /* secondary prose text */
 
-  /* semantic — everything else uses these */
+  /* state palette — tuned for the ink ground, the only place it appears (D41) */
+  --brick:     #F2603F;
+  --ochre:     #D89D58;
+  --verdigris: #66D696;
+  --bisque:    #E4DCCF;
+
+  /* semantic, user space */
   --ground-user:    var(--plaster);
   --ground-machine: var(--ink);
   --fg-user:        var(--ink);
   --fg-machine:     var(--plaster);
+  --fg-muted:       var(--slate);
   --boundary:       var(--ink);
-  --state-allowed:  var(--azulejo);
-  --state-quiet:    var(--bisque);
+  --focus:          var(--azulejo);
+}
+
+/* semantic, machine space — the four states exist here and nowhere else */
+.ground-machine {
+  --focus:          var(--azulejo-light);
+  --state-allowed:  var(--verdigris);
   --state-trapped:  var(--ochre);
   --state-denied:   var(--brick);
+  --state-quiet:    var(--bisque);
 }
 ```
+
+State colour is machine-space colour (D41). A light ground cannot carry four
+saturated text colours that are both legible and tellable apart: 4.5:1 against
+near-white is itself a lightness constraint, so all four land on the same value.
+Prose keeps `--fg-user`, `--fg-muted` and `--focus`.
+
+A state colour must clear 4.5:1 against its ground, stay roughly 25 dE from the
+other states, **and** sit at least 8 L\* from them. Contrast alone passed two
+palettes whose colours were indistinguishable from each other; dE alone passed
+one whose colours shared a lightness. `src/styles/tokens.css` is the
+implementation.
 
 **How dark mode will work later.** The concept already spends both a light and a dark ground, so a dark theme cannot simply darken everything. It **inverts which side is dark**: `--ground-user` becomes ink, `--ground-machine` becomes plaster. The relationship survives, the identity survives, and the change is six lines under `[data-theme="dark"]`. Wire the `data-theme` attribute and the `prefers-color-scheme` listener in Phase 1; ship one theme.
 
@@ -146,8 +169,8 @@ Two families. The split *is* the concept, so it must be strict.
 
 | Role | Family | Notes |
 |---|---|---|
-| Prose, headings, Vitor's voice | **Newsreader** (OFL, Google Fonts, variable) | Optical sizing on. 1.55 line-height. Max 68ch. |
-| Machine output, labels, dates, nav, tables, terminals | **Commit Mono** (free; confirm current license at download) | Never used for prose paragraphs. |
+| Prose, headings, Vitor's voice | **Newsreader** (OFL, Google Fonts, variable) | Optical sizing on. 1.55 line-height. Max 68 characters — *not* the CSS `ch` unit, see D43. |
+| Machine output, labels, dates, nav, tables, terminals | **Commit Mono** (MIT, confirmed — D37) | Never used for prose paragraphs. |
 
 Scale (rem, 16px base): `0.8125 / 0.9375 / 1 / 1.3125 / 1.75 / 2.625 / 4.25`.
 
@@ -166,7 +189,7 @@ Asymmetric two-track grid. Narrow left track is kernel space, wide right track i
 desktop ≥960px
 ┌──────────────┬─┬────────────────────────────────────────┐
 │ kernel track │ │ user track                             │
-│ (mono, 18ch) │ │ (serif prose, max 68ch)                │
+│ (mono, 18 ch)│ │ (serif prose, max 68 chars)            │
 │              │ │                                        │
 │ Aug 2026     │ │ I spent the summer chasing a fifty      │
 │ →  present   │ │ million dollar difference between two   │
@@ -178,8 +201,12 @@ desktop ≥960px
                 ↑ the boundary
 
 mobile <960px
-Tracks stack. Kernel blocks become full-width ink bands
+Tracks stack. Kernel blocks widen into full-width ink bands
 between prose. The boundary becomes horizontal rules.
+
+Kernel blocks sit on the ink ground at every width (D44) — above
+960px as blocks in the narrow track, below it as full-bleed bands.
+The 1px rule is unchanged and now divides two visible grounds.
 ```
 
 Text is left-aligned throughout. Nothing is centered except the 404.
@@ -194,7 +221,7 @@ Everything else: no scroll reveals, no fade-and-slide-up on sections, no hover l
 
 - English is conversational and specific. When Portuguese arrives later it is a rewrite, not a translation.
 - Numbers stay exact and sourced. "$50M discrepancy" beats "large discrepancy" and it's true.
-- Banned strings, enforced by lint: `passionate`, `driven`, `detail-oriented`, `results-oriented`, `team player`, `hit the ground running`.
+- Strings to avoid: `passionate`, `driven`, `detail-oriented`, `results-oriented`, `team player`, `hit the ground running`. Guidance for the writer, not enforced by lint (D48).
 - Failure states speak in the interface's voice. The 404 is `ENOENT` with a real errno table, not "Oops!".
 
 ---
@@ -284,7 +311,7 @@ Cost: a 20–40MB image, desktop only, and a real chance it eats a month. Gate i
 
 ### 5.6 Easter eggs (Phase 5, four maximum)
 
-1. **`curl vrovaris.com`** returns an ANSI-colored plaintext résumé generated from `resume_general_swe.tex`. A Worker sniffs `User-Agent`/`Accept`. Build this one first; it is the best of the four.
+1. **`curl vrovaris.com`** returns an ANSI-colored plaintext résumé generated from `resume/resume_web.tex` (D49). A Worker sniffs `User-Agent`/`Accept`. Build this one first; it is the best of the four.
 2. `/dev/null` — a real route returning 204 and an empty body.
 3. 404 as an errno table with `ENOENT` highlighted.
 4. `/humans.txt`, written properly.
@@ -307,7 +334,7 @@ No Konami code.
 | Domain | **vrovaris.com** at Spaceship, DNS delegated to Cloudflare (D23) | $3.80 first year on a promo code, ~$10.18/year after, free WHOIS privacy. Nameservers point at Cloudflare so Pages, Workers, and D1 work. |
 | Analytics | Cloudflare Web Analytics | No cookies, no consent banner, free. |
 | Tests | Playwright + axe-core, Lighthouse CI | The islands are the risky part. |
-| Résumé | GitHub Action compiles `resume_general_swe.tex` → `/resume.pdf` | Single source of truth; the PDF cannot go stale. |
+| Résumé | GitHub Action compiles `resume/resume_web.tex` → `/resume.pdf` (D49) | Single source of truth; the PDF cannot go stale. |
 
 ### Budget (D8)
 
@@ -425,9 +452,16 @@ Every fact on the site reads from this file. Nothing is hardcoded in a component
 }
 ```
 
-Two lint rules (P1-06):
-1. Fail the build if any `.mdx` contains a bare `$`+digits or a percentage that does not exist in `profile.json`.
-2. Fail the build if any file contains the strings `citizenship`, `passport`, `visa`, `green card`, `work authorization`, or a banned adjective from §4.5. This enforces D2 mechanically rather than relying on memory.
+One lint rule (P1-06, D48): fail the build if anything outside `src/profile.ts`
+imports `src/data/profile.json`, which would bypass the Zod schema and the rule
+that a non-public repo carries no link (D47).
+
+The fact-checking and banned-word rules originally specified here were cut (D48).
+They were guidance for whoever is writing, not conditions a build should fail on —
+`driven` is banned by §4.5 and also the correct word for an *event-driven*
+integration. **D2 is unaffected as a constraint and still absolute; what it loses
+is mechanical enforcement.** Nobody should read D2's "a build lint fails on…" and
+expect that lint to exist.
 
 ---
 
@@ -452,11 +486,11 @@ Estimates are focused hours for one competent agent or one focused Vitor session
 **P1-05 — `profile.json` + typed accessor.**
 *AC:* Zod-validated at build; one exported helper; components cannot import the raw JSON.
 
-**P1-06 — Lint rules.** Both rules from §8.
-*AC:* CI fails on a planted fact violation and on a planted `passport`.
+**P1-06 — Lint rule.** The one rule from §8 (D48).
+*AC:* CI fails on a planted raw import of `profile.json`.
 
-**P1-07 — Résumé CI.** Action compiles `resume_general_swe.tex` → `public/resume.pdf` (D10).
-*AC:* PDF served at `/resume.pdf`; build fails loudly on LaTeX errors.
+**P1-07 — Résumé CI.** Action compiles `resume/resume_web.tex` → `public/resume.pdf` (D10, D49) and opens a pull request.
+*AC:* PDF served at `/resume.pdf`; the job fails loudly on LaTeX errors.
 
 ---
 
