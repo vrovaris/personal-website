@@ -93,8 +93,9 @@ Consequences: …
 | D53 | Home kernel track annotates each prose block | superseded by D54 |
 | D54 | Phase 3 before rest of Phase 2; D53 reverted | active, supersedes D53 |
 | D55 | libseccomp WASM spike succeeded; real cBPF in the browser | active, resolves P3-03 |
+| D56 | WASM output verified byte-identical to native libseccomp | active, evidence for D55 |
 
-**Next free ID: D56.**
+**Next free ID: D57.**
 >>>>>>> Stashed changes
 
 ---
@@ -685,3 +686,9 @@ Consequences:
 3. **The LGPL question is open and blocks shipping, not building.** See Q17.
 4. **This bears on Q16.** The project now has Emscripten for the gate regardless, so a C parser reuses an existing toolchain and D12 stands cheaply. Choosing Rust for P4-01 means adding `wasm-pack` alongside it — a real second toolchain, not a replacement.
 >>>>>>> Stashed changes
+
+**D56 — The WASM build is verified byte-identical to native libseccomp.** *(2026-09-15 · decided by: verification · active · evidence for D55)*
+D55 claimed the spike produces "genuine cBPF". That claim was based on reading the disassembly and finding it correct, which shows the output is plausible, not that it is what libseccomp actually produces. `tools/seccomp-wasm/verify-native.sh` closes the gap: it builds the same libseccomp 2.6.1 and the same harness natively for x86_64, runs both against the same policies, and compares the exported bytes.
+Result: **identical**, on a 3-syscall policy (11 instructions) and on a 20-syscall policy (28 instructions). The second matters more — enough rules to put libseccomp into its balanced jump tree rather than a linear comparison chain, which is where a subtly wrong build would diverge.
+It also demonstrates that the one-line `src/arch.c` modification does not change native behaviour: `__EMSCRIPTEN__` is undefined there, so the file takes its ordinary `__x86_64__` branch.
+Consequence: the gate may state that the bytecode on screen is what libseccomp emits, without hedging. Under §5.1's honesty requirement that distinction is the difference between a true claim and a marketing one.
