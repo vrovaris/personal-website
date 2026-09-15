@@ -9,7 +9,12 @@ The brief is less professional, more personal. The work stays; the framing chang
 
 ## Facts
 
-Every number, date, title, and claim comes from `profile.json`. **If it is not there, stop and ask.** Do not estimate, round, or infer. A fabricated detail on a personal site is worse than a missing one, and CI will fail the build anyway.
+Every number, date, title, and claim comes from `profile.json`. **If it is not there, stop and ask.** Do not estimate, round, or infer. A fabricated detail on a personal site is worse than a missing one.
+
+**Nothing checks this for you.** The fact-checking lint was cut (D48), so the only
+enforcement is the writer's. `profile.json` carries numbers and titles, not
+narrative claims — when prose needs a claim the file does not hold, say so in the
+handover rather than sourcing it from memory.
 
 The kernel track carries the numbers. The prose track explains them and never repeats them.
 
@@ -17,7 +22,7 @@ The kernel track carries the numbers. The prose track explains them and never re
 
 - Conversational and specific. Vitor consistently prefers plain, concise language and pushes back on overstatement — write under, not over.
 - Exact numbers beat vague scale. "$50M discrepancy" is both more interesting and more true than "a large discrepancy".
-- **Banned strings**, enforced by lint: `passionate`, `driven`, `detail-oriented`, `results-oriented`, `team player`, `hit the ground running`. More broadly, no adjective Vitor applies to himself. Show the work instead.
+- **Strings to avoid**: `passionate`, `driven`, `detail-oriented`, `results-oriented`, `team player`, `hit the ground running`. More broadly, no adjective Vitor applies to himself. Show the work instead. Not lint-enforced (D48) — and note `driven` is fine in `event-driven`, which is the correct term for what he built at BTG.
 - Never `citizenship`, `passport`, `visa`, `green card`, `work authorization`. Hard constraint, applies to alt text and metadata too.
 - No third-party names: instructors, peers, classmates, and their sites are described by role, never named.
 - Failure states speak in the interface's voice. The 404 is `ENOENT` with a real errno table, not "Oops!".

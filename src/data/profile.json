@@ -1,5 +1,7 @@
 {
   "name": "Vitor Augusto Hertel Rovaris",
+  "status": "Junior, CS, Purdue",
+  "location": "West Lafayette, IN",
   "links": {
     "github": "https://github.com/vrovaris",
     "linkedin": "https://linkedin.com/in/vrovaris",
@@ -20,11 +22,31 @@
       "start": "2026-06",
       "end": "2026-08",
       "facts": [
-        { "value": "371", "unit": "notes/month", "source": "resume" },
-        { "value": "$140M", "unit": "monthly financial flows", "source": "resume" },
-        { "value": "$0.01–$236M", "unit": "range of an individual note", "source": "resume" },
-        { "value": "$50M", "unit": "discrepancy closed", "source": "resume" },
-        { "value": "3", "unit": "internal systems", "source": "resume" }
+        {
+          "value": "371",
+          "unit": "notes/month",
+          "source": "resume"
+        },
+        {
+          "value": "$140M",
+          "unit": "monthly financial flows",
+          "source": "resume"
+        },
+        {
+          "value": "$0.01–$236M",
+          "unit": "range of an individual note",
+          "source": "resume"
+        },
+        {
+          "value": "$50M",
+          "unit": "discrepancy closed",
+          "source": "resume"
+        },
+        {
+          "value": "3",
+          "unit": "internal systems",
+          "source": "resume"
+        }
       ]
     },
     {
@@ -34,8 +56,16 @@
       "start": "2025-06",
       "end": "2025-08",
       "facts": [
-        { "value": "20,000+", "unit": "signatures processed", "source": "resume" },
-        { "value": "80%", "unit": "efficiency gains presented to executives", "source": "resume" }
+        {
+          "value": "20,000+",
+          "unit": "signatures processed",
+          "source": "resume"
+        },
+        {
+          "value": "80%",
+          "unit": "efficiency gains presented to executives",
+          "source": "resume"
+        }
       ]
     },
     {
@@ -45,12 +75,36 @@
       "start": "2024-10",
       "end": "2026-08",
       "facts": [
-        { "value": "13", "unit": "people managed as director", "source": "resume" },
-        { "value": "4", "unit": "engineers managed as manager", "source": "resume" },
-        { "value": "20,000+", "unit": "members served", "source": "resume" },
-        { "value": "12", "unit": "years of legacy data migrated", "source": "resume" },
-        { "value": "120+", "unit": "point increase in Net Promoter Score", "source": "resume" },
-        { "value": "90%+", "unit": "app adoption across the network", "source": "resume" }
+        {
+          "value": "13",
+          "unit": "people managed as director",
+          "source": "resume"
+        },
+        {
+          "value": "4",
+          "unit": "engineers managed as manager",
+          "source": "resume"
+        },
+        {
+          "value": "20,000+",
+          "unit": "members served",
+          "source": "resume"
+        },
+        {
+          "value": "12",
+          "unit": "years of legacy data migrated",
+          "source": "resume"
+        },
+        {
+          "value": "120+",
+          "unit": "point increase in Net Promoter Score",
+          "source": "resume"
+        },
+        {
+          "value": "90%+",
+          "unit": "app adoption across the network",
+          "source": "resume"
+        }
       ]
     },
     {
@@ -60,8 +114,16 @@
       "start": "2026-08",
       "end": "present",
       "facts": [
-        { "value": "2026–2027", "unit": "Office of Undergraduate Research Scholarship", "source": "resume" },
-        { "value": "National Science Foundation", "unit": "lab funding", "source": "resume" }
+        {
+          "value": "2026–2027",
+          "unit": "Office of Undergraduate Research Scholarship",
+          "source": "resume"
+        },
+        {
+          "value": "National Science Foundation",
+          "unit": "lab funding",
+          "source": "resume"
+        }
       ]
     },
     {
@@ -71,42 +133,75 @@
       "start": "2026-08",
       "end": "present",
       "facts": [
-        { "value": "25", "unit": "students per lab section", "source": "resume" },
-        { "value": "761", "unit": "students enrolled this term", "source": "resume" }
+        {
+          "value": "25",
+          "unit": "students per lab section",
+          "source": "resume"
+        },
+        {
+          "value": "761",
+          "unit": "students enrolled this term",
+          "source": "resume"
+        }
       ]
     }
   ],
   "things": [
     {
       "slug": "hermes",
-      "stack": ["C", "seccomp-BPF", "cgroups v2", "FastAPI"],
+      "stack": [
+        "C",
+        "seccomp-BPF",
+        "cgroups v2",
+        "FastAPI"
+      ],
       "repo": "https://github.com/vrovaris/secure-sandbox",
       "repoPublic": true
     },
     {
       "slug": "grammar",
-      "stack": ["C", "WebAssembly"],
+      "stack": [
+        "C",
+        "WebAssembly"
+      ],
       "repo": "https://github.com/vrovaris/grammar",
       "repoPublic": true
     },
     {
       "slug": "shell",
-      "stack": ["C"],
+      "stack": [
+        "C"
+      ],
       "repo": null,
       "repoPublic": false
     },
     {
       "slug": "medical-scheduler",
-      "stack": ["Next.js", "TypeScript", "Supabase", "Python", "OR-Tools"],
+      "stack": [
+        "Next.js",
+        "TypeScript",
+        "Supabase",
+        "Python",
+        "OR-Tools"
+      ],
       "repo": null,
       "repoPublic": false
     },
     {
       "slug": "this-site",
-      "stack": ["Astro", "TypeScript", "Cloudflare"],
+      "stack": [
+        "Astro",
+        "TypeScript",
+        "Cloudflare"
+      ],
       "repo": null,
       "repoPublic": false
     }
   ],
-  "languages": ["Portuguese", "English", "German", "Spanish"]
+  "languages": [
+    "Portuguese",
+    "English",
+    "German",
+    "Spanish"
+  ]
 }

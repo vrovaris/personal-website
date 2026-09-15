@@ -22,13 +22,21 @@ const { title, noindex = false } = Astro.props;
   .boundary {
     --gutter: 2rem;
     --pad: 1.5rem;
+    /* Ink blocks are padded, and padding eats the track: 18 characters of
+       content need 18 characters plus this on each side, or the text clips. */
+    --kernel-pad: 0.75rem;
+    --kernel-track: calc(var(--measure-kernel) + 2 * var(--kernel-pad));
 
     box-sizing: border-box;
     max-width: calc(
-      var(--measure-kernel) + var(--gutter) + var(--measure-prose) + 2 * var(--pad)
+      var(--kernel-track) + var(--gutter) + var(--measure-prose) + 2 * var(--pad)
     );
     margin-inline: auto;
     padding: 3rem var(--pad);
+    /* The rule runs the height of the document (§4.3). On a short page the
+       document is shorter than the screen, so without this the line stops in
+       mid-air above empty ground. */
+    min-height: 100vh;
 
     /* The rule. One gradient on one element, so it spans the whole document and
        cannot develop gaps between sections — a border on a kernel column would
@@ -42,13 +50,13 @@ const { title, noindex = false } = Astro.props;
     background-image: linear-gradient(var(--boundary), var(--boundary));
     background-repeat: no-repeat;
     background-size: 1px 100%;
-    background-position: calc(var(--pad) + var(--measure-kernel)) 0;
+    background-position: calc(var(--pad) + var(--kernel-track)) 0;
   }
 
   /* Ordinary content sits in the prose track, indented past the rule. No grid
      is involved, so nothing can be pulled out of place by auto-placement. */
   .boundary > :global(*) {
-    margin-inline-start: calc(var(--measure-kernel) + var(--gutter));
+    margin-inline-start: calc(var(--kernel-track) + var(--gutter));
     max-width: var(--measure-prose);
   }
 
@@ -63,7 +71,7 @@ const { title, noindex = false } = Astro.props;
   .boundary > :global(.row) {
     display: grid;
     grid-template-columns:
-      var(--measure-kernel)
+      var(--kernel-track)
       var(--gutter)
       minmax(0, var(--measure-prose));
     margin-inline-start: 0;
@@ -80,8 +88,12 @@ const { title, noindex = false } = Astro.props;
      kernel space legible as machine space (D44). Colour comes from tokens.css. */
   .boundary :global(.kernel) {
     grid-column: 1;
+    /* Hug the content. Grid items stretch by default, which turns a two-line
+       annotation beside a long prose block into a tall empty slab of ink — the
+       block has to mark where its prose starts, not how long that prose is. */
+    align-self: start;
     margin: 0;
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem var(--kernel-pad);
     font-family: var(--font-machine);
     /* --size-m, not --size-s: Commit Mono's x-height is 0.540 against
        Newsreader's 0.426, so 16px of mono optically matches 21px of prose (D39). */
