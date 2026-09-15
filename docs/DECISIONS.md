@@ -83,10 +83,6 @@ Consequences: …
 | D47 | profile.json owns repo links; non-public repos carry none | active, supersedes point 4 of D46 |
 | D48 | Only lint rule is the raw-import check; other two cut | active, supersedes plan §8 rules and D2 enforcement |
 | D49 | CI compiles resume_web.tex and opens a PR; PDF committed | active, amends D10 and answers Q6 |
-<<<<<<< Updated upstream
-
-**Next free ID: D50.**
-=======
 | D50 | profile.json gains status and location | active, extends plan §8 |
 | D51 | Kernel blocks hug content; never stretch to prose height | active, fixes a P1-03 defect |
 | D52 | Kernel track is 18 chars plus padding; rule spans viewport | active, fixes P1-03 and D51 defects |
@@ -94,9 +90,9 @@ Consequences: …
 | D54 | Phase 3 before rest of Phase 2; D53 reverted | active, supersedes D53 |
 | D55 | libseccomp WASM spike succeeded; real cBPF in the browser | active, resolves P3-03 |
 | D56 | WASM output verified byte-identical to native libseccomp | active, evidence for D55 |
+| D57 | Trace format contract precedes harness and evaluator | active, adds P3-00 to plan §9 |
 
-**Next free ID: D57.**
->>>>>>> Stashed changes
+**Next free ID: D58.**
 
 ---
 
@@ -624,8 +620,6 @@ Consequences:
 4. **The LaTeX action is pinned to commit `6549dc21` (v4.1.0), not the tag.** It runs with write access to the repository and a tag can be moved to point at anything.
 5. The action's default `args` are used unchanged; they already carry `-halt-on-error -interaction=nonstopmode -file-line-error`, so a LaTeX error fails the job instead of publishing a half-typeset PDF.
 6. The same `.tex` is read directly, not compiled, by `tools/tex-to-ansi` for the `curl` résumé endpoint (plan §6). One source, two outputs.
-<<<<<<< Updated upstream
-=======
 
 **D50 — `profile.json` gains `status` and `location`.** *(2026-09-14 · decided by: Vitor · active · extends plan §8)*
 Reasoning: §7.1 requires the home page's kernel track to carry status and location, and §8's original shape had neither, so the page could not be built without either inventing a fact or extending the file. Constraint 8 admits only the second.
@@ -685,10 +679,18 @@ Consequences:
 2. **The one modification to libseccomp is reproduced verbatim in `build.sh`,** which matters because libseccomp is LGPL-2.1 and this is a modified derivative.
 3. **The LGPL question is open and blocks shipping, not building.** See Q17.
 4. **This bears on Q16.** The project now has Emscripten for the gate regardless, so a C parser reuses an existing toolchain and D12 stands cheaply. Choosing Rust for P4-01 means adding `wasm-pack` alongside it — a real second toolchain, not a replacement.
->>>>>>> Stashed changes
 
 **D56 — The WASM build is verified byte-identical to native libseccomp.** *(2026-09-15 · decided by: verification · active · evidence for D55)*
 D55 claimed the spike produces "genuine cBPF". That claim was based on reading the disassembly and finding it correct, which shows the output is plausible, not that it is what libseccomp actually produces. `tools/seccomp-wasm/verify-native.sh` closes the gap: it builds the same libseccomp 2.6.1 and the same harness natively for x86_64, runs both against the same policies, and compares the exported bytes.
 Result: **identical**, on a 3-syscall policy (11 instructions) and on a 20-syscall policy (28 instructions). The second matters more — enough rules to put libseccomp into its balanced jump tree rather than a linear comparison chain, which is where a subtly wrong build would diverge.
 It also demonstrates that the one-line `src/arch.c` modification does not change native behaviour: `__EMSCRIPTEN__` is undefined there, so the file takes its ordinary `__x86_64__` branch.
 Consequence: the gate may state that the bytecode on screen is what libseccomp emits, without hedging. Under §5.1's honesty requirement that distinction is the difference between a true claim and a marketing one.
+
+**D57 — A written trace format contract precedes both the harness and the evaluator.** *(2026-09-15 · decided by: recommendation, approved by Vitor · active · adds P3-00 to plan §9)*
+Reasoning: P3-01 builds the capture harness in `secure-sandbox` and P3-02 builds the evaluator here. D27 keeps those repositories apart and no session sees both, so an unwritten agreement between them would be discovered as a mismatch after both are built, and one would be rewritten. §5.1 sketches the shape — `{scenario, argv, seq:[{t, syscall, args_summary, ret}]}` — but leaves every detail that decides whether the halves fit.
+`docs/trace-format.md` settles them. Three are worth naming here because they are decisions, not documentation:
+1. **`seq[].syscall` is the only field a verdict depends on.** Everything else is pre-rendered for display and never parsed. A rendering change in the harness therefore cannot alter a verdict.
+2. **Attack scenarios declare an `escape` list** — the syscalls whose success constitutes escape. Without it, denying a startup syscall such as `brk` kills the program during loading and the page would report *contained*, telling the visitor their policy stopped an attack when it stopped a program from starting. That is precisely the misleading claim §5.1's honesty rule exists to prevent, and it cannot be detected from a trace alone; it takes someone who knows what the scenario does, so `escape` lives beside the scenario in the harness.
+3. **Determinism is a property of the scenario, not a tolerance in the evaluator.** If three captures do not normalise to identical sequences, the scenario is replaced rather than compared loosely.
+Normalisation is also a disclosure control, not tidiness: raw `strace` output carries absolute home paths, a username, and a hostname (D31 point 4, D28). The contract requires stripping them in the private repo's CI, beside the `strings` check, and states that an unnormalised trace must never reach `public/`.
+Consequences: P3-00 is added to plan §9 ahead of P3-01. Both tickets build against the file; changing it is a pull request both sides can read, never an edit to one implementation.

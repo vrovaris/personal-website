@@ -58,8 +58,6 @@ When `personal-website` goes public (D32), all of these change in the same pull 
 2. Set `this-site` in `src/data/profile.json` to `repo: "https://github.com/vrovaris/personal-website"` and `repoPublic: true`. The Zod refine in `src/profile.ts` rejects the URL while the flag is false, so they must move together (D47).
 3. Write the real `README.md` — D32 consequence 5 says the first file a visitor opens must not be the plan.
 Unrelated to this list and never changing: the shell's repo stays `null` permanently (D3, D21, D26).
-<<<<<<< Updated upstream
-=======
 
 **Q15 — `/about_me` is linked from the home page but is not a route.** *(raised during P2-01)*
 Vitor's home copy links to `/about_me`, and §3's information architecture has no such page — the four nav items are `things · work · writing · now`. The link 404s today. It also holds content he has drafted and commented out in `src/pages/index.astro`: growing up with maths, physics and robotics, and CS arriving by way of games. Either add the route to §3 and write it as a Phase 2 ticket, or fold that material into `/now` or the home prose and drop the link. Related: the same paragraph says "Checkout some of my work here" with no link, waiting on `/work` from P2-02.
@@ -78,4 +76,3 @@ Rust has no role in P3-02 (a trace replayer in the browser, next to React, consu
 The spike works (D55), so the site can ship a compiled derivative of libseccomp, which is LGPL-2.1. That carries obligations the project's other dependencies do not: MIT (Commit Mono, the grammar repo) and OFL (Newsreader) both stop at attribution. LGPL requires the licence and source to travel with the binary, and requires recipients to be able to relink against a modified libseccomp.
 Satisfiable as things stand: upstream is unmodified except for one line, `build.sh` reproduces the build exactly and contains that modification in full, and `public/wasm/` can carry `COPYING.LESSER` beside the module the way `public/fonts/` carries `OFL.txt` (D37). What is needed is Vitor's decision to take the obligation on, plus a colophon entry (P2-06) stating it.
 If the answer is no, §5.1's fallback stands — a TypeScript emitter mirroring libseccomp's instruction ordering, labelled as a reimplementation. The spike's output gives an exact reference to mirror, so a negative answer still leaves the four hours well spent.
->>>>>>> Stashed changes

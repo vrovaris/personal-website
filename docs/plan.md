@@ -504,6 +504,9 @@ Estimates are focused hours for one competent agent or one focused Vitor session
 
 ### Phase 3 — The Gate — 16–22h *(moved ahead of the grammar: public repo, strongest signal)*
 
+**P3-00 — Trace format contract** (D57). `docs/trace-format.md`, agreed before either side is written, because the harness and the evaluator live in repositories that cannot see each other.
+*AC:* settles normalisation, determinism, and what counts as escape; both P3-01 and P3-02 build against it.
+
 **P3-01 — Trace capture harness** in the `secure-sandbox` repo. `strace -f -qq -ttt` over 7 attack scenarios and 3 benign programs → JSON, checked in.
 *AC:* deterministic across runs after normalizing addresses and pids; ≤150KB gzipped shipped.
 
