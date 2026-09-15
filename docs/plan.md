@@ -415,7 +415,7 @@ One per role, written as a story with a problem in it. The kernel track carries 
 - `shell` — the CS 252 coursework. Long-form technical writing, plus a **compiled native binary, screenshots, and a recorded session** (D17). No source, no excerpts, no repo link, ever.
   **Distribution (D22):** primary channel is a **public container image** — one copy-pasteable `docker run` line, isolated execution, no source. A package can be public while its source repository stays private. Secondary is a raw stripped binary with a published SHA-256. Linux `x86_64` first, `arm64` if it builds clean, macOS only if it compiles unmodified. Asking visitors to download and execute an unsigned binary is a bad look on a site whose other headline feature is a sandbox.
   **Release checks, blocking, before anything ships:** strip all symbols, no debug info, no DWARF, no source maps, `ASSERTIONS=0`, no `--profiling`; then run `strings` over the artifact and confirm no coursework file name, function name, or error message survives. These run in the **private** repo's CI on every push (D21), so the check is enforced continuously rather than remembered at publish time.
-- `scheduler` — 25 doctors, CP-SAT, LGPD-safe data model. No repo link unless the client agrees.
+- `medical-scheduler` — 25 doctors, CP-SAT, LGPD-safe data model. No repo link unless the client agrees.
 - `this-site` — points at the colophon.
 
 ### 7.4 `/writing`
@@ -438,6 +438,7 @@ Every fact on the site reads from this file. Nothing is hardcoded in a component
 ```jsonc
 {
   "name": "Vitor Augusto Hertel Rovaris",
+  "status": "...", "location": "...",   // D50, carried by the home kernel track
   "links": { "github": "...", "linkedin": "...", "email": "..." },  // no phone number on the site
   "education": {
     "school": "Purdue University",

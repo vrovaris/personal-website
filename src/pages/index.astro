@@ -1,13 +1,89 @@
 ---
-// Placeholder until P2-01. Exists so the deploy path is proven on day one.
-// noindex comes out at launch (Q10).
-// Deliberately has no kernel block: the rule must still run unbroken when a
-// page has nothing in the narrow track.
-import Boundary from '../layouts/Boundary.astro';
-import { profile } from '../profile';
+// Home (plan §7.1): identity block in the kernel track, ~120 words of prose,
+// and the gate above the fold on desktop once P3 lands. The gate is the mass
+// that balances this page; until it exists the left track is deliberately
+// sparse rather than padded with résumé metadata (D54).
+// noindex comes out at launch (Q10, Q14).
+import Boundary from "../layouts/Boundary.astro";
+import { profile } from "../profile";
+
+const { github, linkedin, email } = profile.links;
 ---
 
 <Boundary title={profile.name} noindex>
-  <h1>vrovaris.com</h1>
-  <p>Under construction.</p>
+    <div class="row">
+        <div class="kernel">
+            <p>{profile.status}</p>
+            <p>{profile.location}</p>
+            <ul>
+                <li><a href={github}>github/vrovaris</a></li>
+                <li><a href={linkedin}>in/vrovaris</a></li>
+                <li><a href={`mailto:${email}`}>{email}</a></li>
+                <li><a href="/resume.pdf">resume.pdf</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h1>Vitor Rovaris</h1>
+            <p class="tagline">engineer, low level enthusiast, designer</p>
+            <p>
+                Howdy! This is Vitor and this is my personal place on the
+                internet ;)
+            </p>
+            <p>
+                I'm a CS major at Purdue (class of 2028), 2x SWE intern at <a
+                    href="https://btgpactual.us/">BTG Pactual</a
+                > and former Technology Director at <a href="https://gobrasa.org"
+                    >BRASA</a
+                >.
+            </p>
+            <p>
+                I now work as teaching assistant for <a
+                    href="https://selfservice.mypurdue.purdue.edu/prod/bzwsrch.p_catalog_detail?subject=CS&term=CURRENT&cnbr=18000"
+                    >CS180</a
+                > and do research at the <a
+                    href="https://polytechnic.purdue.edu/facilities/automation-and-intelligent-construction-autoic-lab"
+                    >AutoIC Lab</a
+                >.
+            </p>
+            <p>
+                The rest of what I build is smaller and sits on the boundary
+                between a program and kernels. Checkout some of my work here.
+            </p>
+            <p>
+                Check out some of my links on the left here, a bit more <a
+                    href="/about_me">about me</a
+                >, and if you're looking for an engineer, here's my <a
+                    href="/resume.pdf">resume</a
+                >.
+            </p>
+        </div>
+    </div>
 </Boundary>
+
+<style>
+    h1 {
+        margin-bottom: 0;
+    }
+
+    /* A subtitle, not a heading: it was an <h5> under an <h2>, which skips three
+       levels and fails axe on heading-order. The page also had no <h1>. */
+    .tagline {
+        margin-top: 0.25rem;
+        font-weight: 600;
+    }
+
+    .kernel p + p {
+        margin-top: 0.25rem;
+    }
+
+    .kernel ul {
+        list-style: none;
+        margin: 1rem 0 0;
+        padding: 0;
+    }
+
+    .kernel a {
+        color: inherit;
+    }
+</style>

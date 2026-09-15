@@ -16,6 +16,11 @@ const fact = z.object({
 
 const schema = z.object({
   name: z.string(),
+  // Both carried by the home page's kernel track (plan §7.1). Not in §8's
+  // original shape; added by D50 because the page needs them and no fact may
+  // exist outside this file.
+  status: z.string(),
+  location: z.string(),
   links: z.object({
     github: z.url(),
     linkedin: z.url(),
@@ -56,3 +61,12 @@ const schema = z.object({
 });
 
 export const profile = schema.parse(data);
+
+// Five callers on the home page alone, so this stops being a repeated .find().
+// Throws rather than returning undefined: a missing slug is a typo in a template,
+// and failing the build is better than rendering a page with a hole in it.
+export function role(slug: string) {
+  const found = profile.roles.find((r) => r.slug === slug);
+  if (!found) throw new Error(`no role "${slug}" in profile.json`);
+  return found;
+}
