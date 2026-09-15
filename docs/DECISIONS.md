@@ -83,8 +83,19 @@ Consequences: …
 | D47 | profile.json owns repo links; non-public repos carry none | active, supersedes point 4 of D46 |
 | D48 | Only lint rule is the raw-import check; other two cut | active, supersedes plan §8 rules and D2 enforcement |
 | D49 | CI compiles resume_web.tex and opens a PR; PDF committed | active, amends D10 and answers Q6 |
+<<<<<<< Updated upstream
 
 **Next free ID: D50.**
+=======
+| D50 | profile.json gains status and location | active, extends plan §8 |
+| D51 | Kernel blocks hug content; never stretch to prose height | active, fixes a P1-03 defect |
+| D52 | Kernel track is 18 chars plus padding; rule spans viewport | active, fixes P1-03 and D51 defects |
+| D53 | Home kernel track annotates each prose block | superseded by D54 |
+| D54 | Phase 3 before rest of Phase 2; D53 reverted | active, supersedes D53 |
+| D55 | libseccomp WASM spike succeeded; real cBPF in the browser | active, resolves P3-03 |
+
+**Next free ID: D56.**
+>>>>>>> Stashed changes
 
 ---
 
@@ -612,3 +623,65 @@ Consequences:
 4. **The LaTeX action is pinned to commit `6549dc21` (v4.1.0), not the tag.** It runs with write access to the repository and a tag can be moved to point at anything.
 5. The action's default `args` are used unchanged; they already carry `-halt-on-error -interaction=nonstopmode -file-line-error`, so a LaTeX error fails the job instead of publishing a half-typeset PDF.
 6. The same `.tex` is read directly, not compiled, by `tools/tex-to-ansi` for the `curl` résumé endpoint (plan §6). One source, two outputs.
+<<<<<<< Updated upstream
+=======
+
+**D50 — `profile.json` gains `status` and `location`.** *(2026-09-14 · decided by: Vitor · active · extends plan §8)*
+Reasoning: §7.1 requires the home page's kernel track to carry status and location, and §8's original shape had neither, so the page could not be built without either inventing a fact or extending the file. Constraint 8 admits only the second.
+Consequences: two top-level strings — `status` ("Junior standing in Computer Science at Purdue") and `location` ("West Lafayette, Indiana"), both given by Vitor. `src/profile.ts` validates them like everything else. D2 is unaffected: a city and a class standing are not immigration status, and living in Indiana is already public on the résumé.
+**Related gap, not closed here:** `profile.json` holds numbers and titles but no narrative descriptions, so prose that says *what* a role involved has no source in it. The P2-01 draft draws those phrases from `resume/resume_web.tex`, which Vitor wrote and verified, and every one is listed in that ticket's handover. If P2-02's five long-form entries need the same, the choice is to keep sourcing narrative from the résumé or to add a `description` per role. Decide before writing them, not during.
+
+**D51 — Kernel blocks hug their content; they never stretch to the height of the prose beside them.** *(2026-09-14 · decided by: Vitor, from review · active · fixes a defect in P1-03, refines D44)*
+Reasoning: grid items default to `align-self: stretch`, and P1-03 never overrode it. In the layout demo every row carried three or four lines of prose, so a kernel block stretching to match was invisible and the layout looked right. The first real page has six paragraphs beside a two-line annotation, which stretched the ink block into a roughly 600px slab of empty dark. Vitor called it unusable before it was worth committing.
+A kernel block marks **where its prose starts**, not how long that prose runs. Stretching encodes the second, which is not a fact about anything.
+Consequences:
+1. `align-self: start` on `.kernel` in `Boundary.astro`. Mobile is unaffected — `.row` is `display: block` there, so grid alignment does not apply.
+2. **Kernel content must fit 18 characters or it wraps mid-phrase.** Five of the home page's six strings did not. `profile.json` now carries terse values — `status` "Junior, CS, Purdue" and `location` "West Lafayette, IN", both exactly 18 — and the link labels are `github/vrovaris`, `in/vrovaris`, the email, and `resume.pdf`. Terseness is the kernel track's voice, so this is the design working rather than a compromise.
+3. This is the first entry in Q13's territory — real content meeting the grid — and it says the 18-character track is a hard constraint on what may be written into it, not a soft target.
+
+**D52 — The kernel track is 18 characters *plus* its padding, and the rule runs at least the viewport height.** *(2026-09-14 · decided by: Vitor, from a screenshot · active · fixes defects in P1-03 and D51)*
+Reasoning: three defects that arithmetic had passed and only a rendered page exposed.
+1. **The track was 18 characters including padding, so it held 15.5.** `--measure-kernel` was used directly as the grid track width while `.kernel` also carried `0.75rem` of padding, leaving 148.8px of the 172.8px for text. `vitor@vrovaris.com` clipped mid-word at the block's edge and both 18-character strings wrapped. D51 had just declared 18 characters a hard constraint on kernel content; it was really 15.
+2. **The rule stopped in mid-air.** It is painted at `100%` of the container, and on a page shorter than the screen that ends above empty ground — while §4.3 asks for the full height of the document. `min-height: 100vh` makes the shortest document the screen.
+3. **The page had no `<h1>`,** and went `<h2>` to `<h5>`, skipping three levels. Both fail axe, and §10's accessibility floor is not negotiable. The markup changed; Vitor's words did not.
+Consequences:
+- `--kernel-track: calc(var(--measure-kernel) + 2 * var(--kernel-pad))` is the grid track; `--measure-kernel` goes back to meaning what it says, the text measure. Rule moves to 220.8px, prose starts at 252.8px, container is 859.5px.
+- All six home-page kernel strings now fit on one line.
+- A `--link` token is added, azulejo on the user ground and `--azulejo-light` on the machine ground, because links were rendering in the browser's default blue and visited purple. Blue carries structure (D40), so this is the existing rule applied rather than a new colour.
+**The lesson, recorded because it recurred:** every layout defect in this ticket was invisible to calculation and obvious in a screenshot. Compute the geometry, then look at the page.
+
+**D53 — The home page's kernel track carries an annotation per prose block, not one identity block.** *(2026-09-15 · decided by: Vitor, from a screenshot · active · extends plan §7.1)*
+Reasoning: with a single kernel block at the top, the rule divided content from emptiness for about three-quarters of its length, and Vitor read the result as "a random blue box and a random line out of nowhere". He was describing the layout accurately. The two-track grid only reads as two territories when the narrow track has content the whole way down; the demo page had that and home did not.
+§7.1 specifies status, location, three links and the résumé for home's kernel track, which is one block. This extends it: the identity block stays, and each further prose block gets the annotation §4.3 describes — dates and names on the left, the prose explaining them on the right, never repeating them.
+**Every string in the track is derived from `profile.json`**, including the date ranges, which are formatted from `start` and `end` rather than typed. The track cannot drift from the facts, and a renamed slug or corrected date moves both at once.
+Also noted: the real cause is that home is missing its main element. §7.1 puts the gate above the fold on desktop, and P3 builds it. This makes home work in the meantime rather than pretending the gap is not there — when the gate lands, home's composition should be revisited rather than assumed still correct.
+Consequences:
+1. `role(slug)` is added to `src/profile.ts` — the home page alone has five lookups, which is where a repeated `.find()` stops being acceptable. It throws on a missing slug, so a typo in a template fails the build instead of rendering a hole.
+2. Date ranges render as `Jun–Aug 2026`, `Oct 2024–Aug 2026`, `Aug 2026 → present`. All nineteen kernel lines fit the 18-character track, verified against the rendered HTML.
+3. Plan §7.3's `scheduler` is renamed `medical-scheduler` to match `profile.json`, which is the source of truth (§8).
+
+**D54 — Phase 3 is built before the rest of Phase 2, and D53's home annotations are reverted.** *(2026-09-15 · decided by: Vitor · active · supersedes D53, reorders plan §9)*
+Reasoning: home was tuned three times and still read wrong. The diagnosis, from Vitor's screenshot: the kernel blocks were *repeating* the prose rather than annotating it — `Jun–Aug 2026 / BTG Pactual` beside "2x SWE intern at BTG Pactual" — so the page looked, in his words, like a bad version of his résumé entry. §4.3's pattern requires prose carrying data the kernel track can annotate without duplication. `/work` entries have that (371 notes/month, $140M, $50M reconciled). A conversational home page does not, and dates were the only "data" available, which is exactly why the result read as a CV sidebar.
+The deeper cause is that §7.1's home is identity block **plus the gate above the fold**, and the gate does not exist. Three rounds of tuning went into a frame around an absent picture.
+Consequences:
+1. **D53 is reverted.** Home carries one identity block — status, location, three links, résumé — exactly as §7.1 specifies. The left track is deliberately sparse until the gate fills it, rather than padded with metadata.
+2. **Phase 3 moves ahead of the remainder of Phase 2.** P2-01 is otherwise complete; P2-02 onward waits. When the gate lands, home's composition gets reviewed rather than assumed correct.
+3. `role()` in `src/profile.ts` stays. It is still the right shape for `/work`, where the annotation pattern does apply.
+4. Rejected: a continuous ink column anchored to the viewport edge. It answers the "floating stripe" objection from D44 and would read as territory rather than boxes, but it commits the page to a deliberately lopsided composition before the gate — the element that actually decides the balance — exists to judge it against.
+
+**D55 — The libseccomp WASM spike succeeded: the gate can ship genuine cBPF.** *(2026-09-15 · decided by: the spike's outcome · active · resolves P3-03, informs Q16)*
+Result: `seccomp_export_bpf()` runs under Emscripten and produces real x86_64 seccomp bytecode in the browser. For an allowlist of `read, write, exit_group` it emits 88 bytes — 11 cBPF instructions — which disassemble to an `AUDIT_ARCH_X86_64` check, the x32 ABI guard, three syscall comparisons in libseccomp's own ordering, and `SECCOMP_RET_KILL_PROCESS` as the default with `SECCOMP_RET_ALLOW` on match. §5.1's preferred path is available; the TypeScript emitter fallback is not needed.
+**Size:** 139.8KB raw, **40.1KB gzipped**, against native-wasm.md's 200KB budget. JS glue adds 16.2KB gzipped.
+Five obstacles, none of them the one that was expected — `fork()` and signals never came up, because the export path is computation plus a write to an fd:
+1. **Emscripten ships no Linux kernel headers.** Solved by building inside `emscripten/emsdk`, which is Linux and already has them. `-idirafter` keeps Emscripten's own headers at higher priority.
+2. **The container is aarch64 on Apple Silicon**, so `asm/unistd.h` carried ARM64 syscall numbers. `--platform linux/amd64` makes the headers match the architecture the filters describe.
+3. **glibc's `sys/prctl.h` opens with `__BEGIN_DECLS`**, which Emscripten's musl-flavoured libc does not define. A four-line shim supplies the `PR_*` constants from the libc-agnostic kernel header and declares `prctl()`.
+4. **`syscall()` does not exist in wasm.** Declared in a force-included header and stubbed to return `-ENOSYS`; the BPF export path never calls it.
+5. **libseccomp `#error`s on unknown build architectures.** One line added to `src/arch.c` declaring x86_64 native under `__EMSCRIPTEN__`.
+Also: `seccomp_api_set(6)` is needed before `seccomp_init()`. libseccomp otherwise probes the running kernel to decide which features it may use, and the stubbed `syscall()` pins it at API level 1, which rejects `SCMP_ACT_KILL_PROCESS`. This is the library's supported way to declare the level of the kernel being *targeted* rather than run on, which is exactly the situation.
+Consequences:
+1. `tools/seccomp-wasm/` holds `build.sh` and three small shim files. Upstream source and artefacts are gitignored; the script reproduces everything.
+2. **The one modification to libseccomp is reproduced verbatim in `build.sh`,** which matters because libseccomp is LGPL-2.1 and this is a modified derivative.
+3. **The LGPL question is open and blocks shipping, not building.** See Q17.
+4. **This bears on Q16.** The project now has Emscripten for the gate regardless, so a C parser reuses an existing toolchain and D12 stands cheaply. Choosing Rust for P4-01 means adding `wasm-pack` alongside it — a real second toolchain, not a replacement.
+>>>>>>> Stashed changes

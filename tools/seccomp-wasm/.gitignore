@@ -1,0 +1,2 @@
+# Upstream source, build artefacts, and logs. build.sh reproduces all of it.
+build/

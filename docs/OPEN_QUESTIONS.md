@@ -58,3 +58,24 @@ When `personal-website` goes public (D32), all of these change in the same pull 
 2. Set `this-site` in `src/data/profile.json` to `repo: "https://github.com/vrovaris/personal-website"` and `repoPublic: true`. The Zod refine in `src/profile.ts` rejects the URL while the flag is false, so they must move together (D47).
 3. Write the real `README.md` — D32 consequence 5 says the first file a visitor opens must not be the plan.
 Unrelated to this list and never changing: the shell's repo stays `null` permanently (D3, D21, D26).
+<<<<<<< Updated upstream
+=======
+
+**Q15 — `/about_me` is linked from the home page but is not a route.** *(raised during P2-01)*
+Vitor's home copy links to `/about_me`, and §3's information architecture has no such page — the four nav items are `things · work · writing · now`. The link 404s today. It also holds content he has drafted and commented out in `src/pages/index.astro`: growing up with maths, physics and robotics, and CS arriving by way of games. Either add the route to §3 and write it as a Phase 2 ticket, or fold that material into `/now` or the home prose and drop the link. Related: the same paragraph says "Checkout some of my work here" with no link, waiting on `/work` from P2-02.
+
+**Q16 — Write the clean-room parser in Rust rather than C?** *(raised by Vitor during P2-01; decide before P4-01, not now)*
+Vitor wants to learn Rust and would write most of the parser himself. This supersedes D12 if taken, so it needs a decision entry rather than a quiet switch.
+**For:** D12 chose hand-written recursive descent over Flex/Bison specifically to remove any structural resemblance to the CS 252 template. A different *language* removes it far more completely than a different technique within the same language — "written from scratch in Rust" is a claim nobody can argue with, which strengthens exactly the defence D14's clean-room protocol exists to protect. Rust also compiles to WASM well and the result is a stronger portfolio artifact than another C project. Learning it on a greenfield, MIT-licensed, self-contained parser is close to the ideal first Rust project.
+**Against:** `docs/practices/native-wasm.md` is written around Emscripten and `emcc`; Rust to WASM is `wasm-pack`/`wasm-bindgen`, a different toolchain, so that document needs rewriting rather than amending. Learning a new language while writing a parser doubles the unfamiliar surface. The Hermes gate stays C regardless — seccomp-BPF and cgroups are C's territory — so the project would carry two native toolchains instead of one.
+**Unaffected either way:** D14's reader/implementer split, D17 and D20 on the coursework, and D18's ruling that the interactive uses the clean-room parser rather than a compiled coursework build.
+
+**Decide this after P3-03, because the spike's outcome changes the cost.** P3-03 compiles libseccomp — existing C — to WASM with Emscripten, and Rust has no bearing on it either way. But if that spike *succeeds*, the project carries Emscripten regardless and a C parser reuses the toolchain, so D12 stands cheaply. If it *fails* and the gate ships the labelled TS emitter instead, there is no C toolchain in the project at all: C for the parser means adding Emscripten solely for it, Rust means adding `wasm-pack` solely for it, the cost is equal, and Rust wins on the remaining axes — Vitor wants to learn it, and "written from scratch in Rust" is a stronger clean-room claim than a different technique within the same language, which is precisely what D12 was reaching for.
+
+Rust has no role in P3-02 (a trace replayer in the browser, next to React, consuming JSON — TypeScript) or P3-04 (the panel). Its place is P4-01.
+
+**Q17 — LGPL-2.1 obligations for shipping libseccomp as WASM.** *(raised during P3-03; blocks shipping the module, not building it)*
+The spike works (D55), so the site can ship a compiled derivative of libseccomp, which is LGPL-2.1. That carries obligations the project's other dependencies do not: MIT (Commit Mono, the grammar repo) and OFL (Newsreader) both stop at attribution. LGPL requires the licence and source to travel with the binary, and requires recipients to be able to relink against a modified libseccomp.
+Satisfiable as things stand: upstream is unmodified except for one line, `build.sh` reproduces the build exactly and contains that modification in full, and `public/wasm/` can carry `COPYING.LESSER` beside the module the way `public/fonts/` carries `OFL.txt` (D37). What is needed is Vitor's decision to take the obligation on, plus a colophon entry (P2-06) stating it.
+If the answer is no, §5.1's fallback stands — a TypeScript emitter mirroring libseccomp's instruction ordering, labelled as a reimplementation. The spike's output gives an exact reference to mirror, so a negative answer still leaves the four hours well spent.
+>>>>>>> Stashed changes
