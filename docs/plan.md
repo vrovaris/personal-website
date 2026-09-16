@@ -234,7 +234,7 @@ Three planned, one stretch. Each is a lazy-loaded island that degrades to someth
 
 *Home hero and `/things/hermes`. Hermes is public (D3), so this is the piece that leads.*
 
-A Bulcão-style panel of syscall cells. The visitor toggles which syscalls are permitted. Below, the seven attack scenarios from Hermes' existing test suite run against that policy and report one of three verdicts:
+A Bulcão-style panel of syscall cells. The visitor toggles which syscalls are permitted. Below, the attack scenarios drawn from Hermes' existing test suite (D61) run against that policy and report one of three verdicts:
 
 - **contained** — the exploit hit a denied syscall and took `SIGSYS`
 - **escaped** — the policy let it through
@@ -244,7 +244,7 @@ The tension between *escaped* and *broken* is the whole lesson, and no other por
 
 **What is real and what is not.** State both in the UI:
 
-- **Real: the traces.** In the `secure-sandbox` repo, add a harness that runs the 7 attack scenarios plus 3 benign programs under `strace -f -qq -ttt` and emits JSON: `{scenario, argv, seq:[{t, syscall, args_summary, ret}]}`. Ship those files with the site. They are recordings of real executions on a real kernel, and the repo they come from is public and linkable.
+- **Real: the traces.** In the `secure-sandbox` repo, add a harness that runs the 2 attack scenarios plus 2 benign programs named in D61 under `strace -f -qq -ttt` and emits JSON: `{scenario, argv, seq:[{t, syscall, args_summary, ret}]}`. Ship those files with the site. They are recordings of real executions on a real kernel, and the repo they come from is public and linkable.
 - **Real: the BPF program.** *Spike:* compile `libseccomp` to WASM with Emscripten and call `seccomp_export_bpf()` into MEMFS to produce genuine cBPF from the visitor's allowlist, disassembled on screen. The export path is userspace plus a write to an fd, which MEMFS handles. *Fallback:* a TS emitter mirroring libseccomp's instruction ordering, labeled as a reimplementation.
 - **Not real: the execution.** Traces are replayed against the policy in the browser; nothing runs. One line of copy says so. Do not imply otherwise.
 
@@ -505,11 +505,14 @@ Estimates are focused hours for one competent agent or one focused Vitor session
 
 ### Phase 3 — The Gate — 16–22h *(moved ahead of the grammar: public repo, strongest signal)*
 
-**P3-01 — Trace capture harness** in the `secure-sandbox` repo. `strace -f -qq -ttt` over 7 attack scenarios and 3 benign programs → JSON, checked in.
+**P3-00 — Trace format contract** (D57). `docs/trace-format.md`, agreed before either side is written, because the harness and the evaluator live in repositories that cannot see each other.
+*AC:* settles normalisation, determinism, and what counts as escape; both P3-01 and P3-02 build against it.
+
+**P3-01 — Trace capture harness** in the `secure-sandbox` repo. `strace -f -qq -ttt` over the 2 attack and 2 benign scenarios named in D61 → JSON, checked in. No new scenarios in C; the existing test suite is the material.
 *AC:* deterministic across runs after normalizing addresses and pids; ≤150KB gzipped shipped.
 
 **P3-02 — Policy evaluator.** Replay a trace against an allowlist; return `contained | escaped | broken` plus the divergence index.
-*AC:* unit-tested over 10 traces × 4 reference policies; verified once by hand against the real kernel.
+*AC:* unit-tested over the 4 shipped traces plus hand-written fixtures for the edge cases in `docs/trace-format.md`, each against 4 reference policies; verified once by hand against the real kernel.
 
 **P3-03 — Spike: libseccomp → WASM.** Timebox 4h. Success is real cBPF from `seccomp_export_bpf()`; failure falls back to the TS emitter, labeled.
 *AC:* either path produces a disassembly a systems person would recognize as correct.
