@@ -88,8 +88,15 @@ Consequences: …
 | D52 | Kernel track is 18 chars plus padding; rule spans viewport | active, fixes P1-03 and D51 defects |
 | D53 | Home kernel track annotates each prose block | superseded by D54 |
 | D54 | Phase 3 before rest of Phase 2; D53 reverted | active, supersedes D53 |
+| D55 | libseccomp WASM spike succeeded; real cBPF in the browser | active, resolves P3-03 |
+| D56 | WASM output verified byte-identical to native libseccomp | active, evidence for D55 |
+| D57 | Trace format contract precedes harness and evaluator | active, adds P3-00 to plan §9 |
+| D58 | libseccomp WASM ships; the LGPL-2.1 obligations are taken on | active, answers Q17 |
+| D59 | Clean-room parser stays in C; Rust is not adopted | active, confirms D12 and answers Q16 |
+| D60 | Cloudflare Access is enabled on preview deploys | active, answers Q11 |
+| D61 | Gate ships 4 existing Hermes scenarios; more are additive | active, amends plan §5.1, P3-01, P3-02 |
 
-**Next free ID: D55.**
+**Next free ID: D62.**
 
 ---
 
@@ -660,3 +667,70 @@ Consequences:
 2. **Phase 3 moves ahead of the remainder of Phase 2.** P2-01 is otherwise complete; P2-02 onward waits. When the gate lands, home's composition gets reviewed rather than assumed correct.
 3. `role()` in `src/profile.ts` stays. It is still the right shape for `/work`, where the annotation pattern does apply.
 4. Rejected: a continuous ink column anchored to the viewport edge. It answers the "floating stripe" objection from D44 and would read as territory rather than boxes, but it commits the page to a deliberately lopsided composition before the gate — the element that actually decides the balance — exists to judge it against.
+
+**D55 — The libseccomp WASM spike succeeded: the gate can ship genuine cBPF.** *(2026-09-15 · decided by: the spike's outcome · active · resolves P3-03, informs Q16)*
+Result: `seccomp_export_bpf()` runs under Emscripten and produces real x86_64 seccomp bytecode in the browser. For an allowlist of `read, write, exit_group` it emits 88 bytes — 11 cBPF instructions — which disassemble to an `AUDIT_ARCH_X86_64` check, the x32 ABI guard, three syscall comparisons in libseccomp's own ordering, and `SECCOMP_RET_KILL_PROCESS` as the default with `SECCOMP_RET_ALLOW` on match. §5.1's preferred path is available; the TypeScript emitter fallback is not needed.
+**Size:** 139.8KB raw, **40.1KB gzipped**, against native-wasm.md's 200KB budget. JS glue adds 16.2KB gzipped.
+Five obstacles, none of them the one that was expected — `fork()` and signals never came up, because the export path is computation plus a write to an fd:
+1. **Emscripten ships no Linux kernel headers.** Solved by building inside `emscripten/emsdk`, which is Linux and already has them. `-idirafter` keeps Emscripten's own headers at higher priority.
+2. **The container is aarch64 on Apple Silicon**, so `asm/unistd.h` carried ARM64 syscall numbers. `--platform linux/amd64` makes the headers match the architecture the filters describe.
+3. **glibc's `sys/prctl.h` opens with `__BEGIN_DECLS`**, which Emscripten's musl-flavoured libc does not define. A four-line shim supplies the `PR_*` constants from the libc-agnostic kernel header and declares `prctl()`.
+4. **`syscall()` does not exist in wasm.** Declared in a force-included header and stubbed to return `-ENOSYS`; the BPF export path never calls it.
+5. **libseccomp `#error`s on unknown build architectures.** One line added to `src/arch.c` declaring x86_64 native under `__EMSCRIPTEN__`.
+Also: `seccomp_api_set(6)` is needed before `seccomp_init()`. libseccomp otherwise probes the running kernel to decide which features it may use, and the stubbed `syscall()` pins it at API level 1, which rejects `SCMP_ACT_KILL_PROCESS`. This is the library's supported way to declare the level of the kernel being *targeted* rather than run on, which is exactly the situation.
+Consequences:
+1. `tools/seccomp-wasm/` holds `build.sh` and three small shim files. Upstream source and artefacts are gitignored; the script reproduces everything.
+2. **The one modification to libseccomp is reproduced verbatim in `build.sh`,** which matters because libseccomp is LGPL-2.1 and this is a modified derivative.
+3. **The LGPL question is open and blocks shipping, not building.** See Q17.
+4. **This bears on Q16.** The project now has Emscripten for the gate regardless, so a C parser reuses an existing toolchain and D12 stands cheaply. Choosing Rust for P4-01 means adding `wasm-pack` alongside it — a real second toolchain, not a replacement.
+
+**D56 — The WASM build is verified byte-identical to native libseccomp.** *(2026-09-15 · decided by: verification · active · evidence for D55)*
+D55 claimed the spike produces "genuine cBPF". That claim was based on reading the disassembly and finding it correct, which shows the output is plausible, not that it is what libseccomp actually produces. `tools/seccomp-wasm/verify-native.sh` closes the gap: it builds the same libseccomp 2.6.1 and the same harness natively for x86_64, runs both against the same policies, and compares the exported bytes.
+Result: **identical**, on a 3-syscall policy (11 instructions) and on a 20-syscall policy (28 instructions). The second matters more — enough rules to put libseccomp into its balanced jump tree rather than a linear comparison chain, which is where a subtly wrong build would diverge.
+It also demonstrates that the one-line `src/arch.c` modification does not change native behaviour: `__EMSCRIPTEN__` is undefined there, so the file takes its ordinary `__x86_64__` branch.
+Consequence: the gate may state that the bytecode on screen is what libseccomp emits, without hedging. Under §5.1's honesty requirement that distinction is the difference between a true claim and a marketing one.
+
+**D57 — A written trace format contract precedes both the harness and the evaluator.** *(2026-09-15 · decided by: recommendation, approved by Vitor · active · adds P3-00 to plan §9)*
+Reasoning: P3-01 builds the capture harness in `secure-sandbox` and P3-02 builds the evaluator here. D27 keeps those repositories apart and no session sees both, so an unwritten agreement between them would be discovered as a mismatch after both are built, and one would be rewritten. §5.1 sketches the shape — `{scenario, argv, seq:[{t, syscall, args_summary, ret}]}` — but leaves every detail that decides whether the halves fit.
+`docs/trace-format.md` settles them. Three are worth naming here because they are decisions, not documentation:
+1. **`seq[].syscall` is the only field a verdict depends on.** Everything else is pre-rendered for display and never parsed. A rendering change in the harness therefore cannot alter a verdict.
+2. **Attack scenarios declare an `escape` list** — the syscalls whose success constitutes escape. Without it, denying a startup syscall such as `brk` kills the program during loading and the page would report *contained*, telling the visitor their policy stopped an attack when it stopped a program from starting. That is precisely the misleading claim §5.1's honesty rule exists to prevent, and it cannot be detected from a trace alone; it takes someone who knows what the scenario does, so `escape` lives beside the scenario in the harness.
+3. **Determinism is a property of the scenario, not a tolerance in the evaluator.** If three captures do not normalise to identical sequences, the scenario is replaced rather than compared loosely.
+Normalisation is also a disclosure control, not tidiness: raw `strace` output carries absolute home paths, a username, and a hostname (D31 point 4, D28). The contract requires stripping them in the private repo's CI, beside the `strings` check, and states that an unnormalised trace must never reach `public/`.
+Consequences: P3-00 is added to plan §9 ahead of P3-01. Both tickets build against the file; changing it is a pull request both sides can read, never an edit to one implementation.
+
+**D58 — The gate ships the compiled libseccomp module, and the project takes on its LGPL-2.1 obligations.** *(2026-09-15 · decided by: Vitor · active · answers Q17)*
+Reasoning: D55 and D56 established that the module produces exactly the bytecode native libseccomp produces. §5.1's honesty requirement is the reason that matters — the gate can say the cBPF on screen is what libseccomp emits, without hedging, only if it is actually libseccomp. Shipping a reimplementation and claiming the same would be the marketing version of the claim.
+The obligations are heavier than anything else in the project: MIT (Commit Mono, the grammar repo) and OFL (Newsreader) stop at attribution, while LGPL-2.1 requires the licence and the corresponding source to travel with the binary and requires recipients to be able to relink against a modified libseccomp.
+Rejected: §5.1's fallback, a TypeScript emitter mirroring libseccomp's instruction ordering and labelled as a reimplementation. It carries no licence obligation and would be smaller. It was rejected because the labelling is the problem, not the size: the panel's whole claim is that this is the real thing.
+Consequences:
+1. `public/wasm/` carries `COPYING.LESSER` beside the module, the way `public/fonts/` carries `OFL.txt` (D37).
+2. **`tools/seccomp-wasm/build.sh` is the corresponding source and must stay reproducible.** It already contains the one-line `src/arch.c` modification verbatim (D55). Keeping it exact stops being tidiness and becomes a licence condition.
+3. Relinking is satisfied by the same script: upstream is unmodified except for that line, so a recipient can substitute their own libseccomp and rebuild.
+4. **P2-06's colophon states the dependency, its licence, and where the source is.** This is a blocking item for that ticket, not a nicety.
+5. The module may now ship, so P3-04 is unblocked on this axis.
+
+**D59 — The clean-room parser stays in C; Rust is not adopted.** *(2026-09-15 · decided by: Vitor · active · confirms D12, answers Q16)*
+Reasoning: Q16 said to decide after P3-03 because the spike's outcome changes the cost, and the spike succeeded. The project therefore carries Emscripten for the gate regardless, so a C parser reuses a toolchain that is already here and already documented, while Rust would add `wasm-pack`/`wasm-bindgen` as a genuine second native toolchain for one artifact.
+Rejected: Rust, which had real arguments — Vitor wants to learn it, "written from scratch in Rust" is a stronger clean-room claim than a different technique within the same language, and a greenfield MIT parser is close to an ideal first project. The toolchain count decided it, and the D55 outcome is what made that argument one-sided; had the spike failed, the costs would have been equal and Q16 recommended Rust.
+Consequences:
+1. **D12 stands unchanged:** P4-01 is a hand-written recursive-descent parser in C, not Flex/Bison.
+2. `docs/practices/native-wasm.md` stays as written. Q16 anticipated rewriting it around `wasm-pack`; that does not happen.
+3. The clean-room defence rests where D12 and D14 put it — the technique, the reader/implementer split, and the from-scratch repository — not on a change of language.
+
+**D60 — Cloudflare Access is enabled on preview deploys.** *(2026-09-15 · decided by: Vitor, confirmed working · active · answers Q11)*
+Reasoning: Q11 asked for this before Phase 2 content reached previews, which happened when P2-01 merged. The one-time Zero Trust team-domain setup is done and the Access toggle is on. Free up to 50 users, so D8's budget is unaffected.
+Consequences:
+1. Preview URLs are no longer readable by anyone holding the link, which is what D32 keeps the repository private for.
+2. **Q10 and Q14 are unchanged.** The `noindex` in `src/pages/index.astro` still comes out at launch; Access protects previews, not production. What changes is that the meta tag is no longer the *only* control, which is how Q10 described it.
+
+**D61 — The gate ships four scenarios drawn from Hermes' existing test suite, and new ones are a later addition rather than a prerequisite.** *(2026-09-15 · decided by: Vitor · active · amends plan §5.1 and the P3-01/P3-02 acceptance criteria)*
+Reasoning: §5.1 assumed Hermes' seven test scenarios were all usable as material for a syscall-allowlist game. They are not. Hermes is defence in depth, and only two of the seven are stopped by seccomp — `syscall` (opening a socket) and `jail` (reading `/etc/passwd`). `timeout` is `RLIMIT_CPU`, `virtual_memory` is `RLIMIT_AS`, `physical_memory` is cgroups v2, and `namespace` is a PID namespace. Denying a syscall models none of those, so they cannot be played against an allowlist. Writing five new seccomp-shaped attacks in C was available and was initially recommended; Vitor's ruling is that it is scope, not necessity, and a thin first version is fine.
+Rejected: reframing the game as *which layer stops this?*, which would use all seven scenarios and match what Hermes actually is more honestly than a seccomp-only game does. It was rejected because it strands the libseccomp WASM work (D55, D56, D58), which exists to compile the visitor's **syscall allowlist** into genuine cBPF and is the strongest technical artifact on the site.
+Consequences:
+1. The shipped set is four: attacks `syscall` (escape `socket`) and `jail` (escape `openat`), benign `output` and `namespace`.
+2. **The escaped/broken tension survives at this size.** Two attacks against two legitimate programs is enough for a policy that is too tight to visibly break something, which §5.1 calls the whole lesson. The result is thinner than §5.1 imagined, not different in kind.
+3. `jail` is the delicate one: its escape syscall is `openat`, which the loader also calls during startup, so it is precisely the case `docs/trace-format.md` §"What counts as escape" was written for. In a four-scenario set that case is half the attacks, so it is verified by hand rather than assumed.
+4. **P3-01 drops to a capture harness with no new C.** That is the floor and it cannot go lower — the traces have to come from somewhere public for §5.1's "recordings of real executions" claim to hold.
+5. **More scenarios are a follow-up ticket, not a prerequisite.** If the panel reads thin at four, adding seccomp-shaped attacks — `execve`, `ptrace`, `mount`, `init_module`, `keyctl` — is purely additive: the trace contract, the harness, the evaluator and the panel all take new files without changing. Do that when the panel exists and can be judged, not before.
+6. Plan §5.1, P3-01 and P3-02 are patched to match.

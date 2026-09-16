@@ -1,0 +1,4 @@
+# Upstream source, build artefacts, logs, and the native comparison build.
+# build.sh and verify-native.sh reproduce all of it.
+build/
+build-native/
