@@ -1,0 +1,213 @@
+/* The notebook: desk, facing pages, spine, ruled lines, and type. */
+
+body.desk {
+  background:
+    radial-gradient(ellipse at 30% 10%, #f1e9d8 0%, transparent 60%),
+    var(--desk);
+  color: var(--ink);
+  --fs: 1.375rem;          /* body size; the line math below depends on it */
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: var(--fs);
+  line-height: var(--line);
+  font-optical-sizing: auto;
+}
+
+.notebook {
+  position: relative;
+  width: min(86rem, 100% - 17rem);
+  margin: 1.5rem auto 1.5rem;
+}
+
+/* ---------- the open book ----------
+   Rules sit at Newsreader's baseline: half a line + 0.225em. Spacing is in whole
+   --line units; scripts/rhythm.ts snaps text back onto the lines. */
+
+.book {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 0 minmax(0, 1fr);
+  border-radius: 6px;
+  /* ruled too: shows through the seam between pages and under them mid-turn */
+  background:
+    linear-gradient(var(--paper) 0 calc(var(--line) * 3), transparent 0),
+    repeating-linear-gradient(transparent 0 calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px) var(--line))
+      0 calc(var(--line) / 2 + 0.225 * var(--fs) + 3px),
+    var(--paper);
+  view-transition-name: book;
+  box-shadow:
+    0 1px 1px rgb(60 45 20 / 0.08),
+    0 14px 34px -14px rgb(60 45 20 / 0.4),
+    /* page edges stacked underneath, on both sides */
+    -4px 4px 0 -1px var(--paper), -4px 4px 0 0 rgb(60 45 20 / 0.12),
+    4px 4px 0 -1px var(--paper), 4px 4px 0 0 rgb(60 45 20 / 0.12);
+}
+
+.page {
+  --margin-x: 4.25rem;
+  position: relative;
+  min-height: calc(100vh - 3rem);
+  padding: var(--line) 3rem var(--line) calc(var(--margin-x) + 1.25rem);
+  background:
+    /* red margin line */
+    linear-gradient(90deg, transparent var(--margin-x), color-mix(in srgb, var(--red) 55%, transparent) var(--margin-x) calc(var(--margin-x) + 1.5px), transparent 0),
+    /* blank top band */
+    linear-gradient(var(--paper) 0 calc(var(--line) * 3), transparent 0),
+    /* ruled lines */
+    repeating-linear-gradient(transparent 0 calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px) var(--line)),
+    var(--paper);
+  /* each rule lands 2px under the baseline of the body text */
+  background-position: 0 0, 0 0, 0 calc(var(--line) / 2 + 0.225 * var(--fs) + 3px);
+}
+.page-left {
+  view-transition-name: page-left;
+  border-radius: 6px 0 0 6px;
+}
+.page-right {
+  view-transition-name: page-right;
+  border-radius: 0 6px 6px 0;
+}
+
+/* The spine: a soft fold and a ribbon bookmark (colors: --fold, --ribbon). */
+.binding { position: relative; z-index: 2; view-transition-name: binding; }
+.binding::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -1.5rem;
+  width: 3rem;
+  /* rounded profile: a pointed peak reads as a thin line */
+  background: var(--fold);
+  mask-image: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.12) 18%, rgb(0 0 0 / 0.45) 32%, rgb(0 0 0 / 0.85) 43%, #000 50%, rgb(0 0 0 / 0.85) 57%, rgb(0 0 0 / 0.45) 68%, rgb(0 0 0 / 0.12) 82%, transparent);
+}
+.ribbon {
+  view-transition-name: ribbon;
+  position: absolute;
+  top: -0.2rem;
+  bottom: 0; /* ends exactly at the bottom edge of the pages */
+  left: -0.225rem; /* centred on the fold */
+  width: 0.45rem;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.1), transparent 35%, transparent 65%, rgb(0 0 0 / 0.08)), var(--ribbon);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 0.35rem), 0 100%);
+  box-shadow: 1px 1px 2px rgb(60 45 20 / 0.25);
+}
+
+/* page numbers, outer corners */
+.folio {
+  position: absolute;
+  bottom: 0.4rem;
+  font-family: var(--font-mono);
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+.page-left .folio { left: 1.5rem; }
+.page-right .folio { right: 1.5rem; }
+
+/* top band: "Subject: ____" on the left page, the Santos badge on the right */
+.page-head {
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--line) * 3);
+}
+.page-right .page-head { justify-content: flex-end; gap: 0.75rem; }
+.page-head .santos-note {
+  font-size: 1.15rem;
+  line-height: 1.4rem;
+  max-width: 14rem;
+  text-align: right;
+  color: var(--ink-soft);
+  rotate: -3deg;
+}
+.subject {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex: 1 1 26rem;
+  max-width: 30rem;
+}
+.subject span:first-child {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.subject span:last-child {
+  flex: 1;
+  font-family: var(--font-hand);
+  font-size: 1.5rem;
+  color: var(--pen);
+  border-bottom: 1px solid var(--ink-soft);
+  padding: 0 0.5rem 0.1rem;
+  transform: rotate(-0.4deg);
+}
+
+/* ---------- type ---------- */
+
+.book h1 {
+  font-size: clamp(2.6rem, 2rem + 2.6vw, 4.25rem);
+  line-height: calc(var(--line) * 2);
+  font-weight: 460;
+  letter-spacing: -0.025em;
+}
+.book h2 {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: calc(var(--line) * 2);
+  letter-spacing: -0.01em;
+  margin-top: var(--line);
+}
+.book h1 + * { margin-top: var(--line); }
+/* Two-line headings nudged onto a rule: h1 on the lower, h2 on the upper. */
+.book h1, .book h2 { position: relative; }
+.book h1 { top: calc(var(--line) / 2 + 0.225 * (var(--fs) - 1em) + 2px); }
+.book h2 { top: calc(0.225 * (var(--fs) - 1em) + 2px - var(--line) / 2); }
+.book h3 { font-size: 1.3rem; font-weight: 600; line-height: var(--line); }
+.book p + p { margin-top: var(--line); }
+.book a { color: inherit; text-decoration-color: var(--red); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.book a:hover { color: var(--red); }
+
+.hand { font-family: var(--font-hand); color: var(--pen); }
+.mono { font-family: var(--font-mono); font-size: 0.78em; letter-spacing: 0.02em; }
+
+/* highlighter swipe that animates in when revealed */
+mark {
+  color: inherit;
+  background: linear-gradient(100deg, transparent 0.2em, var(--marker) 0.3em, var(--marker) calc(100% - 0.3em), transparent calc(100% - 0.2em)) no-repeat 0 60% / 0% 72%;
+  transition: background-size 900ms var(--ease) 250ms;
+  padding: 0 0.15em;
+  margin: 0 -0.15em;
+}
+.is-seen mark, mark.is-seen { background-size: 100% 72%; }
+
+/* draggable (scripts/draggable.ts) */
+[data-drag] { cursor: grab; user-select: none; }
+[data-drag].is-held { cursor: grabbing; }
+
+/* ---------- one page at a time on narrower screens ---------- */
+
+@media (max-width: 64rem) {
+  .notebook { width: calc(100% - 2rem); margin-top: 3.75rem; }
+  .book { grid-template-columns: minmax(0, 1fr); }
+  .binding, .page-left .folio { display: none; }
+  .page { min-height: 0; }
+  .page-left { border-radius: 6px 6px 0 0; box-shadow: none; padding-bottom: 0; }
+  .page-right { position: static; border-radius: 0 0 6px 6px; box-shadow: none; padding-top: calc(var(--line) * 2); }
+  /* single column: no top band on the right page */
+  .page-right {
+    background-image: linear-gradient(90deg, transparent var(--margin-x), color-mix(in srgb, var(--red) 55%, transparent) var(--margin-x) calc(var(--margin-x) + 1.5px), transparent 0), repeating-linear-gradient(transparent 0 calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px) var(--line));
+    background-position: 0 0, 0 calc(var(--line) / 2 + 0.225 * var(--fs) + 3px);
+  }
+  /* single column: badge beside the subject line */
+  .page-right .page-head { position: absolute; top: 1.25rem; right: 1.5rem; margin: 0; flex-direction: column-reverse; align-items: flex-end; gap: 0.25rem; }
+  .page-head .santos-note { max-width: 17rem; rotate: -1.5deg; }
+  .page-left .subject { margin-right: 16rem; }
+}
+@media (max-width: 40rem) {
+  body.desk { --fs: 1.1875rem; }
+  .notebook { width: calc(100% - 1rem); margin-bottom: 2rem; }
+  .page { --margin-x: 2.1rem; padding-left: calc(var(--margin-x) + 0.8rem); padding-right: 1.1rem; }
+  .page-right .page-head { top: 0.75rem; right: 1rem; min-height: 0; }
+  .page-left .page-head { align-items: flex-end; min-height: calc(var(--line) * 4); }
+  .page-left .subject { flex-basis: 100%; margin-right: 0; }
+}

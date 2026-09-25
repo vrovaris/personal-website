@@ -1,0 +1,44 @@
+---
+import Notebook from "../layouts/Notebook.astro";
+import IndexCard from "../components/notebook/IndexCard.astro";
+import { projects } from "../data/projects";
+
+// the left page also holds the title
+const half = Math.floor(projects.length / 2);
+const left = projects.slice(0, half);
+const right = projects.slice(half);
+---
+
+<Notebook
+    title="Built"
+    description="Things Vitor built outside of a job: a Linux sandbox, a medical shift scheduler, a Unix shell, and this site."
+    subject="stuff I mess with"
+>
+    <h1>things I built</h1>
+
+    <ul class="cards" data-free>
+        {left.map((p, i) => (
+            <IndexCard project={p} i={i} />
+        ))}
+    </ul>
+
+    <Fragment slot="right">
+        <ul class="cards" data-free>
+            {right.map((p, i) => (
+                <IndexCard project={p} i={i + left.length} />
+            ))}
+        </ul>
+    </Fragment>
+</Notebook>
+
+<style>
+    .cards {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: var(--line);
+    }
+    :global(.page-right) .cards {
+        margin-top: 0;
+    }
+</style>

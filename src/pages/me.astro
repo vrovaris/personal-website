@@ -1,0 +1,386 @@
+---
+import Notebook from "../layouts/Notebook.astro";
+import Scribble from "../components/notebook/Scribble.astro";
+import Polaroid from "../components/notebook/Polaroid.astro";
+import { profile } from "../data/profile";
+
+const { orgs } = profile;
+import { games } from "../data/shelf";
+
+const timeline = [
+    { when: "age 10", what: "first desktop" },
+    { when: "middle school", what: "Lego robotics" },
+    { when: "2024", what: "Purdue, BRASA" },
+    { when: "2025", what: "BTG Pactual" },
+    { when: "2026", what: "AutoIC Lab, TA" },
+];
+---
+
+<Notebook
+    title="Me"
+    description="How I got into computer science: Joinville, my first computer, Lego robots, online games, and math."
+    subject="how I got here"
+>
+    <div class="title-row">
+        <h1>a bit about me</h1>
+        <svg
+            class="pennant"
+            viewBox="0 0 220 90"
+            role="img"
+            aria-label="Purdue pennant"
+        >
+            <rect x="0" y="0" width="6" height="90" rx="2" fill="#8a6040" />
+            <path d="M6 8 L 214 44 L 6 80 Z" fill="#1c1b19" />
+            <path d="M6 8 L 24 11.2 L 24 76.8 L 6 80 Z" fill="#cfb991" />
+            <text x="34" y="51.5" fill="#cfb991">
+                PURDUE
+            </text>
+        </svg>
+    </div>
+
+    <h2>home</h2>
+    <p>
+        I grew up in Joinville, in Santa Catarina, in the south of Brazil. Today
+        I study computer science at{" "}
+        <a class="quiet" href={orgs.purdue}>
+            Purdue
+        </a>
+        , concentrating in systems software and security.
+    </p>
+
+    <h2>my first computer</h2>
+    <p>
+        When I was 10, my parents bought me <mark>my first desktop</mark>. We
+        didn’t leave it alone for long: together we added RAM, plugged in a new
+        fan, and put fresh thermal paste on the processor every once in a while.
+    </p>
+    <svg
+        class="sketch"
+        viewBox="0 0 460 300"
+        role="img"
+        aria-label="Sketch of an open desktop tower: drive bays, power supply, motherboard with the processor, RAM slots, graphics card, and a rear fan. Labels point to the new RAM, the fresh thermal paste, and the new fan."
+        data-reveal
+    >
+        <g class="case">
+            <path d="M46 18 L 262 16 L 264 284 L 44 287 Z" pathLength="1" />
+            <path d="M46 18 L 30 26 L 28 292 L 44 287" pathLength="1" />
+            <path d="M54 287 L 54 294 M 252 285 L 252 292" pathLength="1" />
+            <path d="M37 52 a 4 4 0 1 0 8 0 a 4 4 0 1 0 -8 0" pathLength="1" />
+        </g>
+        <g class="parts">
+            <!-- drive bays -->
+            <path d="M58 34 L 112 34 L 112 118 L 58 118 Z" pathLength="1" />
+            <path
+                d="M62 54 L 108 54 M 62 76 L 108 76 M 62 98 L 108 98"
+                pathLength="1"
+            />
+            <!-- power supply and its fan -->
+            <path d="M58 236 L 150 235 L 151 276 L 58 277 Z" pathLength="1" />
+            <path
+                d="M90 256 a 14 14 0 1 0 28 0 a 14 14 0 1 0 -28 0"
+                pathLength="1"
+            />
+            <path
+                d="M94 250 L 114 250 M 92 256 L 116 256 M 94 262 L 114 262"
+                pathLength="1"
+            />
+            <!-- motherboard, screws, I/O shield -->
+            <path d="M124 30 L 250 29 L 251 214 L 125 215 Z" pathLength="1" />
+            <path
+                d="M130 38 l 5 0 M 132.5 35.5 l 0 5 M 240 37 l 5 0 M 242.5 34.5 l 0 5 M 131 205 l 5 0 M 133.5 202.5 l 0 5 M 241 204 l 5 0 M 243.5 201.5 l 0 5"
+                pathLength="1"
+            />
+            <path d="M252 34 L 260 34 L 260 92 L 252 92 Z" pathLength="1" />
+            <!-- CPU socket and chip -->
+            <path d="M148 50 L 196 49 L 197 97 L 149 98 Z" pathLength="1" />
+            <path d="M160 62 L 185 61 L 185 86 L 160 87 Z" pathLength="1" />
+            <!-- RAM slots, the original stick -->
+            <path
+                d="M205 44 L 205 122 M 214 44 L 214 122 M 223 44 L 223 122 M 232 44 L 232 122"
+                pathLength="1"
+            />
+            <path d="M202 48 L 208 48 L 208 118 L 202 118 Z" pathLength="1" />
+            <!-- chipset heatsink -->
+            <path
+                d="M198 140 L 224 140 L 224 160 L 198 160 Z M 202 144 L 220 156 M 202 152 L 212 158"
+                pathLength="1"
+            />
+            <!-- expansion slots and graphics card -->
+            <path d="M132 168 L 246 168 M 132 204 L 246 204" pathLength="1" />
+            <path d="M130 175 L 246 174 L 246 194 L 130 195 Z" pathLength="1" />
+            <path
+                d="M150 184 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0 M 190 184 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0"
+                pathLength="1"
+            />
+            <!-- cables -->
+            <path
+                d="M150 248 C 172 246, 160 226, 142 215 M 151 262 C 174 262, 182 240, 188 215 M 112 92 C 122 92, 116 122, 125 126"
+                pathLength="1"
+            />
+        </g>
+        <g class="upgrades">
+            <!-- upgrades: new RAM stick, paste, rear fan -->
+            <path
+                d="M211 48 L 217 48 L 217 118 L 211 118 Z"
+                pathLength="1"
+                class="new"
+            />
+            <path
+                d="M166 74 q 6 -8 13 -1 q 5 7 -3 11 q -9 3 -10 -10"
+                pathLength="1"
+                class="paste"
+            />
+            <path d="M200 222 L 252 222 L 252 274 L 200 274 Z" pathLength="1" />
+            <path
+                d="M204 248 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0"
+                pathLength="1"
+            />
+            <path
+                d="M223 248 a 3 3 0 1 0 6 0 a 3 3 0 1 0 -6 0 M 226 245 C 229 236, 238 233, 243 239 M 229 248 C 238 251, 241 260, 235 265 M 226 251 C 223 260, 214 263, 209 257 M 223 248 C 214 245, 211 236, 217 231"
+                pathLength="1"
+            />
+        </g>
+        <g class="pointers">
+            <path d="M298 66 C 270 60, 242 70, 219 82" pathLength="1" />
+            <path d="M298 136 C 250 132, 210 104, 180 80" pathLength="1" />
+            <path d="M298 246 C 282 242, 268 247, 254 248" pathLength="1" />
+        </g>
+        <g class="labels">
+            <text x="304" y="72">
+                +8gb RAM
+            </text>
+            <text x="304" y="142">
+                fresh paste
+            </text>
+            <text x="304" y="252">
+                a new fan
+            </text>
+        </g>
+    </svg>
+
+    <h2>Lego robots</h2>
+    <p>
+        In middle school I did robotics with Lego. I was{" "}
+        <mark>always the programmer</mark> on the team, snapping together code
+        blocks in an editor a lot like Scratch, and I was super excited when the
+        robot did what we intended.
+    </p>
+
+    <Fragment slot="right">
+        <div class="photos">
+            <Polaroid
+                caption="Joinville"
+                src="/photos/joinville.jpg"
+                tilt={-4}
+            />
+            <Polaroid
+                caption="the first desktop"
+                want="the old desktop (still searching for)"
+                tilt={3}
+            />
+        </div>
+
+        <h2>games, and math</h2>
+        <p>I always loved online games:</p>
+        <ul class="games">
+            {games.map((g) => (
+                <li>
+                    {g.name}
+                    {g.note && (
+                        <span class="game-note hand">
+                            <Scribble
+                                shape="star"
+                                class="star"
+                                color="var(--red)"
+                            />{" "}
+                            {g.note}
+                        </span>
+                    )}
+                </li>
+            ))}
+        </ul>
+        <p></p>
+        <p>
+            <mark>Liking computers and liking math</mark> turned out to be a
+            pretty direct route into computer science.
+        </p>
+
+        <h2>so far</h2>
+        <ol class="timeline" data-reveal="load">
+            {timeline.map((t, i) => (
+                <li style={`--i: ${i}`}>
+                    <span class="when mono">{t.when}</span>
+                    <span class="what">{t.what}</span>
+                </li>
+            ))}
+        </ol>
+    </Fragment>
+</Notebook>
+
+<style>
+    /* exactly two lines, to stay on the grid */
+    .title-row {
+        height: calc(var(--line) * 2);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .title-row + * {
+        margin-top: var(--line);
+    }
+    .title-row h1 {
+        white-space: nowrap;
+        font-size: clamp(2.4rem, 1.8rem + 2.6vw, 3.6rem);
+    }
+    .pennant {
+        width: 9.5rem;
+        flex: none;
+        align-self: center;
+        rotate: -6deg;
+        transform-origin: left center;
+        transition: transform 400ms var(--ease);
+    }
+    .pennant:hover {
+        transform: skewY(-3deg) scaleX(0.97);
+    }
+    @media (max-width: 40rem) {
+        .title-row h1 {
+            white-space: normal;
+        }
+        .pennant {
+            width: 6.5rem;
+        }
+    }
+    .pennant text {
+        font-family: var(--font-serif);
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: 2px;
+    }
+
+    .sketch {
+        width: min(100%, 32rem);
+        margin: var(--line) 0 0;
+    }
+    .photos {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: var(--line) 1rem;
+    }
+    .sketch path {
+        fill: none;
+        stroke: var(--ink);
+        stroke-width: 1.6;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        transition: stroke-dashoffset 900ms var(--ease);
+    }
+    .sketch .parts path {
+        stroke: color-mix(in srgb, var(--ink) 75%, transparent);
+        stroke-width: 1.2;
+        transition-delay: 350ms;
+    }
+    .sketch .upgrades path {
+        stroke-width: 1.8;
+        transition-delay: 800ms;
+    }
+    .sketch .new {
+        stroke: var(--red);
+    }
+    .sketch .paste {
+        stroke: var(--ink-soft);
+        fill: color-mix(in srgb, var(--ink-soft) 25%, transparent);
+    }
+    .sketch .pointers path {
+        stroke: var(--pen);
+        transition-delay: 1200ms;
+    }
+    .sketch text {
+        font-family: var(--font-hand);
+        font-size: 19px;
+        fill: var(--pen);
+        opacity: 0;
+        transition: opacity 500ms 1.8s;
+    }
+    .sketch:global(.is-seen) path {
+        stroke-dashoffset: 0;
+    }
+    .sketch:global(.is-seen) text {
+        opacity: 1;
+    }
+
+    .games {
+        padding-left: 1.4rem;
+    }
+    .game-note {
+        margin-left: 0.5rem;
+        color: var(--red);
+        white-space: nowrap;
+    }
+    @media (max-width: 40rem) {
+        .game-note {
+            display: block;
+            margin-left: 0;
+        }
+    }
+    :global(.star) {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        vertical-align: -0.1rem;
+    }
+
+    .timeline {
+        list-style: none;
+        padding: 0 0 0 1.6rem;
+        position: relative;
+        display: grid;
+    }
+    .timeline::before {
+        content: "";
+        position: absolute;
+        top: 0.4rem;
+        bottom: 0.4rem;
+        left: 0.4rem;
+        border-left: 2px dashed var(--ink-soft);
+        transform-origin: top;
+        scale: 1 0;
+        transition: scale 1.4s var(--ease);
+    }
+    .timeline:global(.is-seen)::before {
+        scale: 1 1;
+    }
+    .timeline li {
+        position: relative;
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        opacity: 0;
+        transition: opacity 400ms calc(300ms + var(--i) * 180ms);
+    }
+    .timeline li::before {
+        content: "";
+        position: absolute;
+        top: calc(var(--line) / 2 - 0.45rem);
+        left: -1.6rem;
+        width: 0.9rem;
+        height: 0.9rem;
+        border-radius: 50%;
+        background: var(--paper);
+        border: 2px solid var(--pen);
+    }
+    .timeline:global(.is-seen) li {
+        opacity: 1;
+    }
+    .when {
+        color: var(--ink-soft);
+        min-width: 8rem;
+    }
+    .what {
+        font-style: italic;
+    }
+</style>

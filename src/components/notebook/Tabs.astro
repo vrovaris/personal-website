@@ -1,0 +1,98 @@
+---
+// persisted so the current-tab change animates
+import { pages } from '../../data/pages';
+
+const here = Astro.url.pathname.replace(/\/?$/, '/');
+---
+
+<nav class="tabs" aria-label="Pages" transition:persist="tabs">
+  {
+    pages.map((t) => (
+      <a href={t.href} style={`--tab: ${t.color}`} aria-current={here === t.href ? 'page' : undefined}>
+        {t.label}
+      </a>
+    ))
+  }
+</nav>
+
+<script>
+  const slash = (path: string) => path.replace(/\/?$/, '/');
+  document.addEventListener('astro:after-swap', () => {
+    const tabs = [...document.querySelectorAll<HTMLAnchorElement>('.tabs a')];
+    // flush styles so the change transitions
+    tabs.forEach((a) => getComputedStyle(a).transform);
+    tabs.forEach((a) => {
+      if (slash(a.pathname) === slash(location.pathname)) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+  });
+</script>
+
+<style>
+  .tabs {
+    position: absolute;
+    top: 4.5rem;
+    left: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    z-index: 0;
+  }
+  a {
+    position: relative;
+    display: block;
+    width: 8.5rem;
+    padding: 0.5rem 0.9rem 0.5rem 1.5rem;
+    margin-left: -0.9rem;
+    background: var(--tab);
+    border-radius: 0 10px 10px 0;
+    box-shadow: 0 2px 4px -1px rgb(60 45 20 / 0.25);
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    line-height: 2rem;
+    color: var(--ink);
+    text-decoration: none;
+    transition: transform 450ms var(--ease), padding 450ms var(--ease);
+  }
+  a:hover { transform: translateX(0.35rem); }
+  a::before {
+    content: '';
+    position: absolute;
+    left: 0.55rem;
+    top: 50%;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-top: -0.3rem;
+    border-radius: 50%;
+    background: var(--ink);
+    scale: 0;
+    transition: scale 350ms var(--ease) 150ms;
+  }
+  a[aria-current='page'] { transform: translateX(0.8rem); }
+  a[aria-current='page']::before { scale: 1; }
+
+  @media (max-width: 64rem) {
+    .tabs {
+      top: auto;
+      bottom: 100%;
+      left: 1.5rem;
+      right: 0;
+      flex-direction: row;
+      gap: 0.3rem;
+    }
+    a {
+      width: auto;
+      margin: 0 0 -0.6rem;
+      padding: 0.3rem 0.8rem 0.9rem;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 -1px 3px -1px rgb(60 45 20 / 0.25);
+    }
+    a:hover { transform: translateY(-0.25rem); }
+    a::before { left: 0.45rem; margin-top: -0.6rem; }
+    a[aria-current='page'] { transform: translateY(-0.5rem); padding-left: 1.4rem; }
+  }
+  @media (max-width: 36rem) {
+    .tabs { left: 0.5rem; }
+    a { padding-inline: 0.55rem; font-size: 0.75rem; }
+  }
+</style>

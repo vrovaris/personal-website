@@ -1,0 +1,82 @@
+---
+import type { Project } from '../../data/projects';
+
+interface Props {
+  project: Project;
+  i: number;
+}
+
+const { project: p, i } = Astro.props;
+---
+
+<li class="card" style={`--i: ${i}; --tilt: ${i % 2 ? 0.8 : -0.9}deg`} data-reveal>
+  <header>
+    <h3>{p.link ? <a class="quiet" href={p.link}>{p.name}</a> : p.name}</h3>
+    <span class="dates mono">{p.dates}</span>
+  </header>
+  <p class="tagline">{p.tagline}</p>
+  <p class="summary">{p.short}</p>
+  <ul class="stack" aria-label="Built with">
+    {p.stack.map((s) => <li class="mono">{s}</li>)}
+  </ul>
+  {p.note && <p class="note hand">{p.note}</p>}
+</li>
+
+<style>
+  /* card rules use the page baseline offset */
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 0 1.4rem calc(var(--line) * 0.5);
+    background:
+      linear-gradient(transparent calc(var(--line) * 2 - 1px), color-mix(in srgb, var(--red) 60%, transparent) 0 calc(var(--line) * 2), transparent 0),
+      linear-gradient(#fffefa 0 calc(var(--line) * 2), transparent 0),
+      repeating-linear-gradient(transparent 0 calc(var(--line) - 1px), #dbe6f2 calc(var(--line) - 1px) var(--line))
+        0 calc(var(--line) / 2 + 0.225 * var(--fs) + 3px),
+      #fffefa;
+    box-shadow: 0 1px 2px rgb(60 45 20 / 0.12), 0 14px 24px -16px rgb(60 45 20 / 0.5);
+    rotate: var(--tilt);
+    opacity: 0;
+    translate: 0 1.5rem;
+    transition:
+      opacity 600ms var(--ease) calc(var(--i) * 110ms),
+      translate 600ms var(--ease) calc(var(--i) * 110ms),
+      rotate 300ms var(--ease),
+      box-shadow 300ms var(--ease);
+  }
+  .card:global(.is-seen) { opacity: 1; translate: 0 0; }
+  .card:global(.is-seen):hover {
+    rotate: 0deg;
+    translate: 0 -0.3rem;
+    box-shadow: 0 2px 4px rgb(60 45 20 / 0.1), 0 24px 34px -18px rgb(60 45 20 / 0.55);
+    transition-delay: 0s;
+  }
+
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; height: calc(var(--line) * 2); padding-top: calc(var(--line) * 0.55); }
+  h3 { font-weight: 560; font-size: 1.9rem; line-height: var(--line); }
+  .dates { color: var(--ink-soft); white-space: nowrap; }
+  .tagline { font-style: italic; color: var(--ink-soft); }
+  .card p + p { margin-top: 0; }
+
+  .stack { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0 0.45rem; }
+  .stack li {
+    height: calc(var(--line) - 0.4rem);
+    margin: 0.2rem 0;
+    padding: 0 0.45rem;
+    border: 1.5px solid var(--pen);
+    border-radius: 3px;
+    color: var(--pen);
+    line-height: calc(var(--line) - 0.4rem - 3px);
+    background: #fffefa;
+  }
+  .stack li:nth-child(odd) { rotate: -1.5deg; }
+  .stack li:nth-child(even) { rotate: 1deg; }
+
+  .note { color: var(--red); font-size: 0.95em; rotate: -1deg; }
+
+  @media (max-width: 40rem) {
+    header { display: grid; align-content: center; gap: 0; padding-top: 0; }
+    .dates { line-height: calc(var(--line) * 0.8); }
+  }
+</style>

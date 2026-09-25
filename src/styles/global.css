@@ -1,0 +1,110 @@
+/* tokens, reset, page turn */
+
+:root {
+  --paper: #fcf8ef;
+  --desk: #e8dfcc;
+  --ink: #27231e;
+  --ink-soft: #6d655a;
+  --pen: #2447a6;          /* blue ballpoint: handwriting */
+  --red: #c8553d;          /* margin line, corrections */
+  --rule: #cfdcec;         /* notebook lines */
+  --marker: #ffe57a;       /* highlighter */
+  --ribbon: #A31C1C;       /* the bookmark ribbon down the spine */
+  --fold: rgb(60 45 20 / 0.1); /* the shadow in the fold between the pages */
+
+  --line: 2.25rem;         /* notebook line spacing; prose sits on it */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  color-scheme: light;
+}
+
+/* Scales the whole desktop layout (everything is in rem). */
+@media (min-width: 64.01rem) {
+  html { font-size: 80%; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+/* reserve the scrollbar's space so the book doesn't shift between pages */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scrollbar-gutter: stable; }
+body { margin: 0; }
+img, svg { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+h1, h2, h3, p, ul, ol, figure, blockquote { margin: 0; }
+
+:focus-visible { outline: 2px dashed var(--pen); outline-offset: 3px; }
+
+/* A discreet link: reads as plain text with a faint underline until hovered. */
+a.quiet, .book a.quiet, .clean-page a.quiet {
+  color: inherit;
+  text-decoration: underline 1px color-mix(in srgb, currentColor 30%, transparent);
+  text-underline-offset: 0.18em;
+  transition: color 150ms, text-decoration-color 150ms;
+}
+a.quiet:hover, .book a.quiet:hover, .clean-page a.quiet:hover { color: var(--red); text-decoration-color: var(--red); }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* Page turn: each flip is two halves, lift then land. Narrow screens and /work fade. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+::view-transition-group(*) { animation-duration: 0s; }
+
+@keyframes lift-right { to { transform: perspective(2600px) rotateY(-90deg); filter: brightness(0.85); } }
+@keyframes land-left { from { transform: perspective(2600px) rotateY(90deg); filter: brightness(0.85); } }
+@keyframes lift-left { to { transform: perspective(2600px) rotateY(90deg); filter: brightness(0.85); } }
+@keyframes land-right { from { transform: perspective(2600px) rotateY(-90deg); filter: brightness(0.85); } }
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes fade-in { from { opacity: 0; } }
+
+::view-transition-old(*), ::view-transition-new(*) {
+  animation-duration: 340ms;
+  animation-fill-mode: both;
+  mix-blend-mode: normal;
+  backface-visibility: hidden;
+}
+/* spine and ribbon above the turning pages */
+::view-transition-group(binding), ::view-transition-group(ribbon) { z-index: 3; }
+::view-transition-new(binding) { animation: none; }
+/* only the new spine (heights can differ) */
+::view-transition-old(binding), ::view-transition-old(ribbon):not(:only-child) { display: none; }
+/* ribbon stretches with the book height */
+::view-transition-new(ribbon) { height: 100%; animation: none; }
+/* pages that stay put while the other one flips */
+::view-transition-old(page-left), ::view-transition-new(page-left),
+::view-transition-old(page-right), ::view-transition-new(page-right) { animation-name: none; }
+
+/* ease the book to the new page height */
+::view-transition-group(book), ::view-transition-group(page-left),
+::view-transition-group(page-right), ::view-transition-group(binding),
+::view-transition-group(ribbon) {
+  animation-duration: 680ms;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+}
+::view-transition-group(page-left), ::view-transition-group(page-right),
+::view-transition-group(binding) { overflow: clip; }
+::view-transition-old(book), ::view-transition-new(book) { height: 100%; animation: none; }
+::view-transition-old(book):not(:only-child) { display: none; }
+
+@media (min-width: 64.01rem) {
+  html[data-astro-transition='forward']::view-transition-old(page-right) { animation: lift-right 340ms ease-in both; transform-origin: left center; z-index: 2; }
+  html[data-astro-transition='forward']::view-transition-new(page-left) { animation: land-left 340ms ease-out 340ms both; transform-origin: right center; }
+  html[data-astro-transition='back']::view-transition-old(page-left) { animation: lift-left 340ms ease-in both; transform-origin: right center; z-index: 2; }
+  html[data-astro-transition='back']::view-transition-new(page-right) { animation: land-right 340ms ease-out 340ms both; transform-origin: left center; }
+}
+@media (max-width: 64rem) {
+  ::view-transition-old(page-left), ::view-transition-old(page-right) { animation: fade-out 200ms both; }
+  ::view-transition-new(page-left), ::view-transition-new(page-right) { animation: fade-in 260ms 120ms both; }
+}
+/* notebook <-> /work fades */
+html[data-astro-transition]::view-transition-old(*):only-child { animation: fade-out 220ms both; }
+html[data-astro-transition]::view-transition-new(*):only-child { animation: fade-in 320ms 140ms both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after, ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

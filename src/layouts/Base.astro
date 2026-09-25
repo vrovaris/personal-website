@@ -1,0 +1,68 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import { Font } from 'astro:assets';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  bodyClass: string;
+}
+
+const { title, description, bodyClass } = Astro.props;
+const fullTitle = title === 'Vitor Rovaris' ? title : `${title} · Vitor Rovaris`;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="A notebook page: howdy! I’m Vitor. CS at Purdue, from Joinville, Brazil." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#e8dfcc" />
+    <Font cssVariable="--font-serif" preload />
+    <Font cssVariable="--font-mono" />
+    <Font cssVariable="--font-hand" />
+    <ClientRouter />
+  </head>
+  <body class={bodyClass}>
+    <slot />
+  </body>
+</html>
+
+<script>
+  import { pages } from '../data/pages';
+
+  // page-turn direction from the tab order
+  const slash = (path: string) => path.replace(/\/?$/, '/');
+  const order = pages.map((p) => p.href);
+  // links to the current page do nothing
+  document.addEventListener(
+    'click',
+    (e) => {
+      const a = (e.target as Element).closest('a');
+      if (a && a.origin === location.origin && slash(a.pathname) === slash(location.pathname) && !a.hash) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    },
+    true,
+  );
+
+  document.addEventListener('astro:before-preparation', (e) => {
+    const from = order.indexOf(slash(e.from.pathname));
+    const to = order.indexOf(slash(e.to.pathname));
+    if (from !== -1 && to !== -1) e.direction = to < from ? 'back' : 'forward';
+  });
+</script>

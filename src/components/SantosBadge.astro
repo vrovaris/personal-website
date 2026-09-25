@@ -1,0 +1,104 @@
+---
+import { santosForm, describe } from '../lib/santos';
+
+let form: Awaited<ReturnType<typeof santosForm>> | undefined;
+try {
+  form = await santosForm();
+} catch (err) {
+  // don't fail the build if ESPN is down
+  console.warn(`[santos] ${err}`);
+}
+---
+
+<aside class="santos" data-unbeaten={form?.unbeaten} aria-label="Santos FC unbeaten counter">
+  <img src="/santos-logo.png" alt="" width="36" height="36" />
+  <span class="text">
+    <span class="club">Santos FC</span>
+    {
+      form ? (
+        <>
+          <span class="line mono">
+            <b data-count>–</b> <span data-noun>{form.unbeaten === 1 ? 'match' : 'matches'}</span> unbeaten
+          </span>
+          <span class="more mono" data-last>last game {describe(form.last)}</span>
+        </>
+      ) : (
+        <span class="line mono">scores unavailable</span>
+      )
+    }
+  </span>
+</aside>
+
+<script>
+  import { santosForm, describe } from '../lib/santos';
+
+  function countUp(el: HTMLElement, to: number) {
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / 900);
+      el.textContent = String(Math.round(to * (1 - (1 - t) ** 3)));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  document.addEventListener('astro:page-load', async () => {
+    const badge = document.querySelector<HTMLElement>('.santos[data-unbeaten]');
+    if (!badge) return;
+    const count = badge.querySelector<HTMLElement>('[data-count]')!;
+    countUp(count, Number(badge.dataset.unbeaten));
+
+    // refresh with games played since the build
+    const form = await santosForm().catch(() => undefined);
+    if (!form) return;
+    count.textContent = String(form.unbeaten);
+    badge.querySelector('[data-noun]')!.textContent = form.unbeaten === 1 ? 'match' : 'matches';
+    badge.querySelector('[data-last]')!.textContent = `last game ${describe(form.last)}`;
+  });
+</script>
+
+<style>
+  .santos {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.4rem 0.9rem 0.4rem 0.45rem;
+    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    border-radius: 999px;
+    background: var(--paper);
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+  img { width: 2.8rem; height: 2.8rem; flex: none; object-fit: contain; }
+  .text { display: grid; }
+  .club { font-weight: 600; font-size: 1.15rem; }
+  .line { font-size: 0.88rem; color: var(--ink-soft); }
+  .line b { color: var(--ink); font-weight: 400; font-variant-numeric: tabular-nums; }
+  /* tooltip above the badge, in the page's blank top band */
+  .more {
+    position: absolute;
+    bottom: calc(100% + 0.3rem);
+    right: 0;
+    z-index: 5;
+    padding: 0.25rem 0.7rem;
+    border-radius: 4px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.82rem;
+    opacity: 0;
+    translate: 0 0.3rem;
+    pointer-events: none;
+    transition: opacity 200ms var(--ease), translate 200ms var(--ease);
+  }
+  .santos:hover .more { opacity: 1; translate: 0 0; }
+  .santos { z-index: 5; }
+
+  @media (max-width: 40rem) {
+    img { width: 2.25rem; height: 2.25rem; }
+    .club { font-size: 0.95rem; }
+    .line { font-size: 0.72rem; }
+    /* phones: tooltip below the badge */
+    .more { font-size: 0.66rem; bottom: auto; top: calc(100% + 0.3rem); }
+  }
+</style>

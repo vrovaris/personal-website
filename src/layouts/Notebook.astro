@@ -1,0 +1,52 @@
+---
+// default slot: left page; slot="right": right page
+import Base from './Base.astro';
+import Tabs from '../components/notebook/Tabs.astro';
+import SantosBadge from '../components/SantosBadge.astro';
+import { pages } from '../data/pages';
+import '../styles/notebook.css';
+
+interface Props {
+  title: string;
+  description: string;
+  subject: string;
+  badge?: boolean; // Santos badge; off on the 404
+}
+
+const { title, description, subject, badge = true } = Astro.props;
+
+// tab n = pages 2n-1 and 2n
+const n = pages.findIndex((p) => p.href === Astro.url.pathname.replace(/\/?$/, '/')) + 1;
+const folios = n ? [2 * n - 1, 2 * n] : ['?', '?'];
+---
+
+<Base title={title} description={description} bodyClass="desk">
+  <div class="notebook">
+    <Tabs />
+    <main class="book">
+      <section class="page page-left">
+        <header class="page-head">
+          <p class="subject"><span>Subject</span><span>{subject}</span></p>
+        </header>
+        <slot />
+        <p class="folio" aria-hidden="true" data-free>p. {folios[0]}</p>
+      </section>
+      <div class="binding" aria-hidden="true"><span class="ribbon"></span></div>
+      <section class="page page-right">
+        <header class="page-head">
+          {badge && <p class="santos-note hand">like soccer? stay tuned!</p>}
+          {badge && <SantosBadge />}
+        </header>
+        <slot name="right" />
+        <p class="folio" aria-hidden="true" data-free>p. {folios[1]}</p>
+      </section>
+    </main>
+  </div>
+</Base>
+
+<script>
+  import { reveal } from '../scripts/reveal';
+  import { rhythm } from '../scripts/rhythm';
+  document.addEventListener('astro:page-load', reveal);
+  document.addEventListener('astro:page-load', rhythm);
+</script>

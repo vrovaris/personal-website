@@ -1,0 +1,268 @@
+---
+import { existsSync } from 'node:fs';
+import Clean from '../layouts/Clean.astro';
+import { profile } from '../data/profile';
+import { work } from '../data/work';
+import { projects } from '../data/projects';
+
+// shown only if public/resume.pdf exists
+const hasPdf = existsSync('public/resume.pdf');
+
+const highlights = [
+  { value: '$50M', label: 'accounting discrepancy closed at BTG' },
+  { value: '20,000+', label: 'members on the platform I led at BRASA' },
+  { value: '13', label: 'people managed as Technology Director' },
+  { value: profile.education.gpa.split('/')[0], label: 'GPA at Purdue' },
+];
+const { links, education } = profile;
+---
+
+<Clean
+  title="Work"
+  description="Vitor Rovaris: résumé. CS at Purdue; software engineering at BTG Pactual; Technology Director at BRASA; research at Purdue's AutoIC Lab."
+>
+  <nav class="topbar no-print" aria-label="Page">
+    <a href="/" class="back">← back to the notebook</a>
+    <span class="actions">
+      {hasPdf && <a href="/resume.pdf">résumé (PDF)</a>}
+      <button type="button" class="print">print</button>
+    </span>
+  </nav>
+
+  <header class="intro" data-reveal>
+    <h1>{profile.name}</h1>
+    <p class="role">
+      Computer Science at {education.school} · {education.concentration} · graduating May 2028
+    </p>
+    <ul class="contact">
+      <li><a href={`mailto:${links.email}`}>{links.email}</a></li>
+      <li><a href={links.github}>github.com/vrovaris</a></li>
+      <li><a href={links.linkedin}>linkedin.com/in/vrovaris</a></li>
+      <li>{profile.location}</li>
+    </ul>
+    <p class="summary">
+      Software engineering internships at BTG Pactual, nearly two years leading technology at BRASA, and now
+      undergraduate research on AI for construction automation at Purdue’s AutoIC Lab.
+    </p>
+  </header>
+
+  <ul class="highlights">
+    {
+      highlights.map((h, i) => (
+        <li data-reveal style={`--i: ${i + 1}`}>
+          <span class="h-value">{h.value}</span>
+          <span class="h-label">{h.label}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="columns">
+    <div>
+      <section>
+        <h2>Experience</h2>
+        {
+          work.map((job) => (
+            <article class="job" data-reveal>
+              <header class="job-head">
+                <h3><a class="quiet" href={job.url}>{job.org}</a></h3>
+                <span class="muted">{job.place}</span>
+              </header>
+              <ol class="roles">
+                {job.roles.map((r) => (
+                  <li>
+                    <div class="role-head">
+                      <span class="role-title">{r.url ? <a class="quiet" href={r.url}>{r.title}</a> : r.title}</span>
+                      <span class="muted dates">{r.dates}</span>
+                    </div>
+                    <ul class="points">
+                      {r.points.map((pt) => (
+                        <li>{pt}</li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            </article>
+          ))
+        }
+      </section>
+
+      <section>
+        <h2>Projects</h2>
+        {
+          projects
+            .filter((p) => p.name !== 'This notebook')
+            .map((p) => (
+              <article class="project" data-reveal>
+                <div class="role-head">
+                  <span class="role-title">
+                    {p.link ? <a href={p.link}>{p.name}</a> : p.name} <span class="muted">· {p.tagline}</span>
+                  </span>
+                  <span class="muted dates">{p.dates}</span>
+                </div>
+                <p>{p.summary}</p>
+                <p class="stack muted">{p.stack.join(' · ')}</p>
+              </article>
+            ))
+        }
+      </section>
+    </div>
+
+    <aside>
+      <section data-reveal>
+        <h2>Education</h2>
+        <p class="role-title">{education.school}</p>
+        <p>{education.degree}</p>
+        <p class="muted">Concentration in {education.concentration}</p>
+        <p class="muted">{education.dates} · GPA {education.gpa}</p>
+        <p class="small">{education.coursework.join(', ')}</p>
+      </section>
+
+      <section data-reveal>
+        <h2>Skills</h2>
+        {
+          Object.entries(profile.skills).map(([group, items]) => (
+            <div class="skill-group">
+              <p class="small-caps">{group}</p>
+              <ul class="chips">
+                {items.map((s) => (
+                  <li>{s}</li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </section>
+
+      <section data-reveal>
+        <h2>Languages</h2>
+        <ul class="plain">
+          {
+            profile.languages.map((l) => (
+              <li>
+                {l.name} <span class="muted">· {l.level}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </aside>
+  </div>
+</Clean>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelector('.print')?.addEventListener('click', () => print());
+  });
+</script>
+
+<style>
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; font-size: 0.9rem; }
+  .back { font-family: var(--font-mono); font-size: 0.82rem; }
+  .actions { display: flex; gap: 1rem; align-items: center; }
+  .print {
+    font-family: var(--font-mono);
+    border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+    background: none;
+    border-radius: 999px;
+    padding: 0.15rem 0.8rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .print:hover { border-color: var(--ink); }
+
+  h1 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+  .role { margin-top: 0.6rem; font-size: 1.05rem; color: var(--ink-soft); }
+  .contact { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem 1.25rem; margin-top: 0.9rem; font-size: 0.92rem; }
+  .summary { margin-top: 1.25rem; max-width: 44rem; font-size: 1.05rem; }
+
+  .highlights {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    margin: 2.25rem 0 0.5rem;
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+    border-block: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+  .highlights li { display: grid; align-content: start; gap: 0.2rem; padding: 1rem 1rem 1.1rem; background: #fffdf9; }
+  .h-value { font-family: var(--font-serif); font-size: 1.9rem; line-height: 1.1; font-weight: 500; letter-spacing: -0.02em; }
+  .h-label { font-size: 0.82rem; line-height: 1.35; color: var(--ink-soft); }
+
+  .columns { display: grid; grid-template-columns: minmax(0, 1fr) 16.5rem; gap: 3.5rem; }
+  section { margin-top: 2.25rem; }
+  h2 {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 1rem;
+  }
+  h3 { font-size: 1.15rem; font-weight: 650; }
+  .muted { color: var(--ink-soft); }
+  .small { font-size: 0.88rem; color: var(--ink-soft); margin-top: 0.4rem; }
+  .small-caps { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+
+  .job + .job { margin-top: 1.75rem; }
+  .job-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .job-head .muted { font-size: 0.88rem; }
+
+  .roles { list-style: none; padding: 0 0 0 1.1rem; margin-top: 0.5rem; border-left: 2px solid color-mix(in srgb, var(--ink) 12%, transparent); }
+  .roles > li { position: relative; }
+  .roles > li + li { margin-top: 0.9rem; }
+  .roles > li::before {
+    content: '';
+    position: absolute;
+    left: calc(-1.1rem - 5px);
+    top: 0.55rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fffdf9;
+    border: 2px solid var(--pen);
+  }
+  .role-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+  .role-title { font-weight: 600; font-size: 1rem; }
+  .dates { font-size: 0.85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .points { margin-top: 0.3rem; padding-left: 1.1rem; font-size: 0.95rem; }
+  .points li + li { margin-top: 0.25rem; }
+  .points li::marker { color: color-mix(in srgb, var(--ink) 35%, transparent); }
+
+  .project + .project { margin-top: 1.25rem; }
+  .project p { font-size: 0.95rem; margin-top: 0.25rem; }
+  .project .stack { font-size: 0.82rem; }
+
+  aside section:first-child { margin-top: 2.25rem; }
+  aside p { font-size: 0.95rem; }
+  .skill-group + .skill-group { margin-top: 0.9rem; }
+  .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+  .chips li {
+    font-size: 0.8rem;
+    padding: 0.05rem 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--pen) 8%, transparent);
+    color: color-mix(in srgb, var(--pen) 80%, var(--ink));
+  }
+  .plain { list-style: none; padding: 0; font-size: 0.95rem; }
+
+  @media (max-width: 52rem) {
+    .columns { grid-template-columns: 1fr; gap: 0; }
+    .highlights { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 30rem) {
+    .role-head, .job-head { flex-direction: column; gap: 0; }
+  }
+  @media print {
+    .highlights { display: none; }
+    .columns { grid-template-columns: 1fr 13rem; gap: 2rem; }
+  }
+</style>

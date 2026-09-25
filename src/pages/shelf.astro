@@ -1,0 +1,566 @@
+---
+import Notebook from "../layouts/Notebook.astro";
+import { books, movies, music } from "../data/shelf";
+
+const hasAudio = music.some((m) => m.audio);
+---
+
+<Notebook
+    title="Shelf"
+    description="The books, movies, and music Vitor would defend in an argument."
+    subject="stuff I’d defend in an argument"
+>
+    <h1>the shelf</h1>
+
+    <section class="books" aria-labelledby="books-h">
+        <h2 id="books-h">books</h2>
+        <div class="bookcase">
+            <div class="spines">
+                {books.map((b, i) => (
+                    <button
+                        type="button"
+                        class="spine"
+                        style={`--c: ${b.color}; --h: ${16 + ((i * 2) % 3)}rem`}
+                        aria-pressed={i === 0 ? "true" : "false"}
+                        aria-controls={`book-${i}`}
+                    >
+                        <span class="spine-title">{b.title}</span>
+                        <span class="spine-author mono">
+                            {b.author.split(" ").at(-1)}
+                        </span>
+                    </button>
+                ))}
+            </div>
+            <div class="plank" aria-hidden="true"></div>
+            <p class="pull-hint hand" aria-hidden="true">
+                ↑ pull one out
+            </p>
+        </div>
+        <div class="book-quotes" data-free>
+            {books.map((b, i) => (
+                <blockquote id={`book-${i}`} hidden={i !== 0}>
+                    {b.quote && <p>“{b.quote}”</p>}
+                    <footer class="mono">
+                        {b.title}, {b.author}
+                    </footer>
+                </blockquote>
+            ))}
+        </div>
+    </section>
+
+    <Fragment slot="right">
+        <section aria-labelledby="movies-h">
+            <h2 id="movies-h">movies</h2>
+            <ul class="tickets" data-free data-reveal>
+                {movies.map((m, i) => (
+                    <li style={`--tilt: ${i % 2 ? 1.5 : -1.5}deg; --i: ${i}`}>
+                        <button
+                            type="button"
+                            class="ticket"
+                            aria-pressed="false"
+                            aria-label={`${m.title}: flip for a quote`}
+                        >
+                            <span class="flip">
+                                <span class="face front">
+                                    <span class="admit mono">admit one</span>
+                                    <span class="t-title">{m.title}</span>
+                                    <span class="t-meta mono">
+                                        {m.director}
+                                        <br />
+                                        {m.year}
+                                    </span>
+                                </span>
+                                <span class="face back">
+                                    <span class="t-quote">“{m.quote}”</span>
+                                </span>
+                            </span>
+                        </button>
+                    </li>
+                ))}
+            </ul>
+        </section>
+
+        <section aria-labelledby="music-h">
+            <h2 id="music-h">on repeat</h2>
+            <p class="hand music-note">
+                {hasAudio
+                    ? "press a song for a preview"
+                    : "no sound yet, I promise."}
+            </p>
+            <div class="music-row">
+                <div class="cassette" role="group" aria-label="Cassette: on repeat" data-reveal>
+                    <div class="label">
+                        <span class="side mono">Side A</span>
+                        <div class="artists hand">
+                            {music.map((m, i) => (
+                                <button
+                                    type="button"
+                                    class="track"
+                                    style={`--i: ${i}`}
+                                    data-audio={m.audio}
+                                    disabled={!m.audio}
+                                    aria-pressed="false"
+                                >
+                                    {i + 1}. {m.artist}
+                                    {m.song && (
+                                        <span class="song">{m.song}</span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div class="window" aria-hidden="true">
+                        <span class="reel"></span>
+                        <span class="tape-band"></span>
+                        <span class="reel"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </Fragment>
+</Notebook>
+
+<script>
+    document.addEventListener("astro:page-load", () => {
+        const spines = document.querySelectorAll<HTMLButtonElement>(".spine");
+        spines.forEach((spine) =>
+            spine.addEventListener("click", () => {
+                spines.forEach((s) => {
+                    const on = s === spine;
+                    s.setAttribute("aria-pressed", String(on));
+                    document.getElementById(
+                        s.getAttribute("aria-controls")!,
+                    )!.hidden = !on;
+                });
+            }),
+        );
+
+        document
+            .querySelectorAll<HTMLButtonElement>(".ticket")
+            .forEach((t) =>
+                t.addEventListener("click", () =>
+                    t.setAttribute(
+                        "aria-pressed",
+                        String(t.getAttribute("aria-pressed") !== "true"),
+                    ),
+                ),
+            );
+
+        // play tracks in order, looping
+        const tape = document.querySelector<HTMLElement>(".cassette");
+        if (!tape) return;
+        const tracks = [
+            ...tape.querySelectorAll<HTMLButtonElement>(".track:not(:disabled)"),
+        ];
+        const audio = new Audio();
+        current = audio;
+        let i = -1;
+        const show = () => {
+            tape.classList.toggle("is-playing", !audio.paused);
+            tracks.forEach((t, j) =>
+                t.setAttribute("aria-pressed", String(!audio.paused && j === i)),
+            );
+        };
+        const play = (j: number) => {
+            if (j !== i) {
+                i = j;
+                audio.src = tracks[i].dataset.audio!;
+            }
+            audio.play();
+        };
+        audio.addEventListener("play", show);
+        audio.addEventListener("pause", show);
+        audio.addEventListener("ended", () => play((i + 1) % tracks.length));
+        tracks.forEach((t, j) =>
+            t.addEventListener("click", () =>
+                j === i && !audio.paused ? audio.pause() : play(j),
+            ),
+        );
+    });
+
+    // stop when leaving the page
+    let current: HTMLAudioElement | undefined;
+    document.addEventListener("astro:before-swap", () => current?.pause());
+</script>
+
+<style>
+    section + section {
+        margin-top: var(--line);
+    }
+
+    /* ---------- books ---------- */
+    .books {
+        margin-top: var(--line);
+    }
+    .book-quotes {
+        margin-top: var(--line);
+    }
+    .bookcase {
+        position: relative;
+        width: fit-content;
+        max-width: 100%;
+    }
+    .spines {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        gap: 0.3rem;
+        min-height: 20rem;
+        padding: 0 1.5rem 0 0.5rem;
+    }
+    .spine {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        width: 4.3rem;
+        height: var(--h);
+        padding: 0.9rem 0 0.7rem;
+        border: 0;
+        border-radius: 3px 3px 1px 1px;
+        background:
+            linear-gradient(
+                90deg,
+                rgb(0 0 0 / 0.18),
+                transparent 18%,
+                transparent 80%,
+                rgb(0 0 0 / 0.22)
+            ),
+            linear-gradient(
+                transparent 1.2rem,
+                rgb(255 255 255 / 0.35) 1.2rem 1.35rem,
+                transparent 1.35rem calc(100% - 2.8rem),
+                rgb(255 255 255 / 0.35) calc(100% - 2.8rem) calc(100% - 2.65rem),
+                transparent 0
+            ),
+            var(--c);
+        color: #fff;
+        cursor: pointer;
+        transform-origin: bottom left;
+        transition: transform 350ms var(--ease);
+    }
+    .spine:hover {
+        transform: translateY(-0.5rem);
+    }
+    .spine[aria-pressed="true"] {
+        transform: translateY(-1.4rem) rotate(-5deg);
+    }
+    .spine-title {
+        writing-mode: vertical-rl;
+        rotate: 180deg;
+        font-family: var(--font-serif);
+        font-weight: 600;
+        font-size: 1.25rem;
+        line-height: 1.1;
+        letter-spacing: 0.02em;
+    }
+    .spine-author {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        line-height: 1;
+    }
+    .plank {
+        height: 0.9rem;
+        border-radius: 2px;
+        background: linear-gradient(#b0835a, #8a6040);
+        box-shadow: 0 6px 10px -6px rgb(60 30 10 / 0.6);
+    }
+    .pull-hint {
+        margin-left: 1.5rem;
+        font-size: 1.45rem;
+        rotate: -2deg;
+    }
+
+    .book-quotes blockquote {
+        padding: 1.25rem 1.5rem;
+        background: #fffefa;
+        border-left: 4px solid var(--red);
+        box-shadow: 0 10px 20px -14px rgb(60 45 20 / 0.5);
+        animation: open 450ms var(--ease);
+    }
+    .book-quotes p {
+        font-size: 1.55rem;
+        line-height: 2.35rem;
+        font-style: italic;
+        font-weight: 380;
+        max-width: none;
+    }
+    .book-quotes footer {
+        margin-top: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--ink-soft);
+        line-height: 1.4rem;
+    }
+    @keyframes open {
+        from {
+            opacity: 0;
+            translate: -1rem 0;
+        }
+    }
+
+    /* ---------- movie tickets ---------- */
+    .tickets {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+        gap: 2rem;
+    }
+    .tickets li {
+        rotate: var(--tilt);
+        perspective: 900px;
+    }
+    .tickets li:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: min(100%, 17rem);
+    }
+    .ticket {
+        display: block;
+        width: 100%;
+        height: 14rem;
+        padding: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+    }
+    /* only .flip rotates: a rotating button loses hover mid-flip */
+    .flip {
+        position: relative;
+        display: block;
+        height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 600ms var(--ease);
+    }
+    .ticket[aria-pressed="true"] .flip {
+        transform: rotateY(180deg);
+    }
+    @media (hover: hover) {
+        .ticket:hover .flip {
+            transform: rotateY(180deg);
+        }
+    }
+    .face {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0.9rem 1.2rem;
+        backface-visibility: hidden;
+        /* punched half-circles on both short edges */
+        mask:
+            radial-gradient(circle at 0 50%, #0000 0.7rem, #000 0.72rem) left /
+                51% 100% no-repeat,
+            radial-gradient(circle at 100% 50%, #0000 0.7rem, #000 0.72rem)
+                right / 51% 100% no-repeat;
+    }
+    .front {
+        background: #f4d9a0;
+        border-top: 3px dashed rgb(0 0 0 / 0.2);
+        text-align: center;
+        align-items: center;
+    }
+    .back {
+        background: var(--ink);
+        color: var(--paper);
+        transform: rotateY(180deg);
+    }
+    .admit {
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--red);
+    }
+    .t-title {
+        font-family: var(--font-serif);
+        font-weight: 600;
+        font-size: 1.6rem;
+        line-height: 1.9rem;
+        margin: 0.4rem 0;
+    }
+    .t-meta {
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+        line-height: 1.4rem;
+    }
+    .t-quote {
+        font-style: italic;
+        font-size: 1.45rem;
+        line-height: 1.4;
+        text-align: left;
+    }
+
+    /* ---------- cassette ---------- */
+    .cassette {
+        display: block;
+        width: min(100%, 28rem);
+        margin-top: 0.75rem;
+        padding: 1rem 1.2rem 1.4rem;
+        background: #2f2c29;
+        border-radius: 12px;
+        box-shadow:
+            inset 0 0 0 3px #45403b,
+            0 14px 22px -14px rgb(0 0 0 / 0.6);
+        rotate: -1.5deg;
+    }
+    .label {
+        display: grid;
+        padding: 0.4rem 0.8rem 0.3rem;
+        background:
+            repeating-linear-gradient(#fff9e6 0 2rem, #e9c9b7 2rem 2.1rem) 0
+                1.75rem,
+            #fff9e6;
+        border-radius: 4px;
+    }
+    .side {
+        font-size: 0.8rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--red);
+        line-height: 1.4rem;
+        translate: 0 -0.2rem;
+    }
+    .artists {
+        display: grid;
+        font-size: 1.6rem;
+        line-height: 2.1rem;
+    }
+    .track {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        column-gap: 0.6rem;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: none;
+        font: inherit;
+        line-height: inherit;
+        color: inherit;
+        text-align: left;
+        cursor: pointer;
+    }
+    .track:hover:not(:disabled) {
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 4px;
+    }
+    .track:disabled {
+        cursor: default;
+    }
+    .song {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: 1.05rem;
+        color: var(--ink-soft);
+    }
+    .track[aria-pressed="true"],
+    .track[aria-pressed="true"] .song {
+        color: var(--red);
+    }
+    .music-row {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    .music-note {
+        margin-top: calc(var(--line) * -1);
+        margin-left: 1.5rem;
+        color: var(--ink-soft);
+        rotate: -2deg;
+    }
+    .window {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0.9rem 2.2rem 0;
+        padding: 0.5rem 0.9rem;
+        background: #1b1917;
+        border-radius: 2rem;
+    }
+    .reel {
+        width: 2.6rem;
+        height: 2.6rem;
+        border-radius: 50%;
+        background:
+            conic-gradient(
+                from 0deg,
+                #eee 0 10%,
+                transparent 0 33.3%,
+                #eee 0 43.3%,
+                transparent 0 66.6%,
+                #eee 0 76.6%,
+                transparent 0
+            ),
+            radial-gradient(
+                circle,
+                #1b1917 0 0.45rem,
+                #d8d2c8 0.47rem 0.9rem,
+                #1b1917 0.92rem
+            );
+        animation: spin 2.4s linear infinite paused;
+    }
+    .tape-band {
+        flex: 1;
+        height: 1.6rem;
+        margin: 0 0.25rem;
+        background: #5a3b2a;
+        border-radius: 3px;
+        opacity: 0.8;
+    }
+    /* ---------- entrances ---------- */
+    .tickets li {
+        opacity: 0;
+        translate: 0 -1rem;
+        transition:
+            opacity 500ms var(--ease) calc(350ms + var(--i) * 140ms),
+            translate 500ms var(--ease) calc(350ms + var(--i) * 140ms);
+    }
+    .tickets:global(.is-seen) li {
+        opacity: 1;
+        translate: 0 0;
+    }
+    .cassette {
+        opacity: 0;
+        translate: 0 1.5rem;
+        rotate: 3deg;
+        transition:
+            opacity 600ms var(--ease) 500ms,
+            translate 700ms var(--ease) 500ms,
+            rotate 700ms var(--ease) 500ms;
+    }
+    .cassette:global(.is-seen) {
+        opacity: 1;
+        translate: 0 0;
+        rotate: -1.5deg;
+    }
+    .track {
+        clip-path: inset(0 100% 0 0);
+        transition: clip-path 700ms ease-out calc(1000ms + var(--i) * 350ms);
+    }
+    .cassette:global(.is-seen) .track {
+        clip-path: inset(0 0 0 0);
+    }
+    @keyframes wind {
+        from {
+            transform: rotate(-540deg);
+        }
+    }
+    .cassette:global(.is-seen) .reel {
+        animation:
+            spin 2.4s linear infinite paused,
+            wind 1.6s cubic-bezier(0.2, 0.6, 0.3, 1) 900ms backwards;
+    }
+
+    .cassette.is-playing .reel {
+        animation-play-state: running;
+    }
+    @keyframes spin {
+        to {
+            rotate: 1turn;
+        }
+    }
+</style>
