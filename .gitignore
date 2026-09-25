@@ -25,9 +25,6 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# full-size originals of the photos, kept locally, never published
-media-originals/
-
 # instructions for AI coding assistants: kept on this computer only
 AGENTS.md
 CLAUDE.md
@@ -44,7 +41,5 @@ GEMINI.md
 # editor settings
 .vscode/
 
-# personal notes and source files the site doesn't need
-docs/
-resume/
-tools/
+# notes, photo originals, and the link-preview source: kept on this computer only
+local/
