@@ -1,5 +1,5 @@
 ---
-// persisted so the current-tab change animates
+// persisted so the current-tab change animates; tabs prefetch on load so flips skip the network
 import { pages } from '../../data/pages';
 
 const here = Astro.url.pathname.replace(/\/?$/, '/');
@@ -8,7 +8,7 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
 <nav class="tabs" aria-label="Pages" transition:persist="tabs">
   {
     pages.map((t) => (
-      <a href={t.href} style={`--tab: ${t.color}`} aria-current={here === t.href ? 'page' : undefined}>
+      <a href={t.href} data-astro-prefetch="load" style={`--tab: ${t.color}`} aria-current={here === t.href ? 'page' : undefined}>
         {t.label}
       </a>
     ))

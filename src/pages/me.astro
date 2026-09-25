@@ -175,8 +175,9 @@ const timeline = [
             />
             <Polaroid
                 caption="the first desktop"
-                want="the old desktop (still searching for)"
+                src="/photos/desktop.jpg"
                 tilt={3}
+                tall
             />
         </div>
 
@@ -266,6 +267,7 @@ const timeline = [
     .photos {
         display: flex;
         justify-content: space-around;
+        align-items: flex-start;
         flex-wrap: wrap;
         gap: var(--line) 1rem;
     }

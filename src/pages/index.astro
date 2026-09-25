@@ -73,20 +73,14 @@ const contents = pages
     <Fragment slot="right">
         <div class="snapshots" data-free>
             <div class="me">
-                <p class="me-note hand">that’s me</p>
-                <Scribble shape="arrowDown" class="me-arrow" />
-                <Polaroid
-                    caption="me"
-                    src="/photos/me.jpg"
-                    tilt={-3}
-                />
+                <Polaroid caption="me" src="/photos/me.jpg" tilt={-3} />
+                <div class="me-label">
+                    <p class="me-note hand">that’s me</p>
+                    <Scribble shape="arrowDown" class="me-arrow" />
+                </div>
             </div>
             <div class="second">
-                <Polaroid
-                    caption="Purdue"
-                    src="/photos/purdue.jpg"
-                    tilt={5}
-                />
+                <Polaroid caption="Purdue" src="/photos/purdue.jpg" tilt={5} />
             </div>
         </div>
 
@@ -138,7 +132,7 @@ const contents = pages
         display: grid;
         grid-template-columns: 1fr 1fr;
         align-items: start;
-        margin-top: calc(var(--line) * -1);
+        margin-bottom: calc(var(--line) * -1);
     }
     .me {
         display: grid;
@@ -148,25 +142,26 @@ const contents = pages
     .second {
         display: grid;
         justify-items: center;
-        margin: calc(var(--line) * 6) 0 0 -3rem;
+        margin: calc(var(--line) * 5) 0 0 -3rem;
+    }
+    /* above the photo even after dragging (draggable.ts z-index starts at 10) */
+    .me-label {
+        position: relative;
+        z-index: 1000;
+        display: flex;
+        align-items: end;
+        margin-top: -1.3rem;
+        translate: -4.6rem 0.8rem;
     }
     .me-note {
         font-size: 1.4rem;
         rotate: -6deg;
-        translate: -4rem 0;
-    }
-    /* above the photo even after dragging (draggable.ts z-index starts at 10) */
-    .me-note {
-        position: relative;
-        z-index: 1000;
     }
     :global(.me-arrow) {
-        position: relative;
-        z-index: 1000;
-        width: 2.4rem;
-        height: 3.2rem;
-        translate: -3.2rem -0.4rem;
-        margin-bottom: -1.6rem;
+        width: 3rem;
+        height: 4rem;
+        rotate: -90deg; /* tail by the note, tip up at the photo */
+        margin-left: 0.8rem;
     }
 
     .contents {
@@ -223,15 +218,13 @@ const contents = pages
     @media (max-width: 40rem) {
         .snapshots {
             grid-template-columns: 1fr;
+            margin-bottom: 0;
         }
         .me {
             justify-items: start;
         }
-        .me-note {
-            translate: 1rem 0;
-        }
-        :global(.me-arrow) {
-            translate: 1.5rem -0.4rem;
+        .me-label {
+            translate: 0.25rem 0.5rem;
         }
         .second {
             justify-items: end;

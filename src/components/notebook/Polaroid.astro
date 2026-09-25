@@ -4,16 +4,17 @@ interface Props {
   want?: string; // placeholder text
   src?: string;
   tilt?: number;
+  tall?: boolean; // 2:3 photo instead of square
 }
 
-const { caption, want, src, tilt = -3 } = Astro.props;
+const { caption, want, src, tilt = -3, tall = false } = Astro.props;
 ---
 
 <figure class="polaroid" data-drag style={`--tilt: ${tilt}deg`}>
   <span class="tape" aria-hidden="true"></span>
   {
     src ? (
-      <img src={src} alt={caption} width="800" height="800" loading="lazy" draggable="false" />
+      <img class:list={[{ tall }]} src={src} alt={caption} width="800" height={tall ? 1200 : 800} loading="lazy" draggable="false" />
     ) : (
       <div class="empty" role="img" aria-label={`Photo placeholder: ${want}`}>
         <span>photo goes here</span>
@@ -62,6 +63,7 @@ const { caption, want, src, tilt = -3 } = Astro.props;
     aspect-ratio: 1;
     object-fit: cover;
   }
+  img.tall { aspect-ratio: 2 / 3; }
   .empty {
     display: grid;
     place-content: center;
