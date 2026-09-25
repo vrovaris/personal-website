@@ -17,6 +17,20 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
 
 <script>
   const slash = (path: string) => path.replace(/\/?$/, '/');
+
+  // spinner on the destination tab, only if the page takes a moment
+  let slow = 0;
+  const done = () => {
+    clearTimeout(slow);
+    document.querySelectorAll<HTMLElement>('.tabs a[data-loading]').forEach((a) => delete a.dataset.loading);
+  };
+  document.addEventListener('astro:before-preparation', (e) => {
+    done();
+    const tab = [...document.querySelectorAll<HTMLAnchorElement>('.tabs a')].find((a) => slash(a.pathname) === slash(e.to.pathname));
+    if (tab) slow = window.setTimeout(() => (tab.dataset.loading = ''), 150);
+  });
+  document.addEventListener('astro:after-preparation', done);
+
   document.addEventListener('astro:after-swap', () => {
     const tabs = [...document.querySelectorAll<HTMLAnchorElement>('.tabs a')];
     // flush styles so the change transitions
@@ -68,8 +82,17 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
     scale: 0;
     transition: scale 350ms var(--ease) 150ms;
   }
-  a[aria-current='page'] { transform: translateX(0.8rem); }
+  a[aria-current='page'], a[data-loading] { transform: translateX(0.8rem); }
   a[aria-current='page']::before { scale: 1; }
+  a[data-loading]::before {
+    scale: 1;
+    background: none;
+    border: 2px solid var(--ink);
+    border-right-color: transparent;
+    transition: none;
+    animation: spin 700ms linear infinite;
+  }
+  @keyframes spin { to { rotate: 1turn; } }
 
   @media (max-width: 64rem) {
     .tabs {
@@ -89,7 +112,7 @@ const here = Astro.url.pathname.replace(/\/?$/, '/');
     }
     a:hover { transform: translateY(-0.25rem); }
     a::before { left: 0.45rem; margin-top: -0.6rem; }
-    a[aria-current='page'] { transform: translateY(-0.5rem); padding-left: 1.4rem; }
+    a[aria-current='page'], a[data-loading] { transform: translateY(-0.5rem); padding-left: 1.4rem; }
   }
   @media (max-width: 36rem) {
     .tabs { left: 0.5rem; }
