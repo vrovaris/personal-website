@@ -31,7 +31,7 @@ export const profile = {
   languages: [
     { name: 'Portuguese', level: 'native' },
     { name: 'English', level: 'proficient' },
-    { name: 'German', level: 'intermediate' },
+    { name: 'German', level: 'upper-intermediate (B2)' },
     { name: 'Spanish', level: 'intermediate' },
   ],
   skills: {
