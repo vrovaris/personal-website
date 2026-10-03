@@ -215,6 +215,15 @@ const timeline = [
                 </li>
             ))}
         </ol>
+
+        <h2>languages</h2>
+        <ul class="languages">
+            {profile.languages.map((l) => (
+                <li>
+                    {l.name} <span class="level mono">{l.level}</span>
+                </li>
+            ))}
+        </ul>
     </Fragment>
 </Notebook>
 
@@ -384,5 +393,15 @@ const timeline = [
     }
     .what {
         font-style: italic;
+    }
+
+    .languages {
+        padding-left: 1.4rem;
+    }
+    .level {
+        margin-left: 0.5rem;
+        line-height: 1;
+        color: var(--ink-soft);
+        font-size: 0.85em;
     }
 </style>

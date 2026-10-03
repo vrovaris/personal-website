@@ -32,14 +32,16 @@ try {
 <script>
   import { santosForm, describe } from '../lib/santos';
 
+  let frame = 0;
+
   function countUp(el: HTMLElement, to: number) {
     const start = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - start) / 900);
       el.textContent = String(Math.round(to * (1 - (1 - t) ** 3)));
-      if (t < 1) requestAnimationFrame(step);
+      if (t < 1) frame = requestAnimationFrame(step);
     };
-    requestAnimationFrame(step);
+    frame = requestAnimationFrame(step);
   }
 
   document.addEventListener('astro:page-load', async () => {
@@ -51,6 +53,7 @@ try {
     // refresh with games played since the build
     const form = await santosForm().catch(() => undefined);
     if (!form) return;
+    cancelAnimationFrame(frame); // else the count-up overwrites this with the build value
     count.textContent = String(form.unbeaten);
     badge.querySelector('[data-noun]')!.textContent = form.unbeaten === 1 ? 'match' : 'matches';
     badge.querySelector('[data-last]')!.textContent = `last game ${describe(form.last)}`;
