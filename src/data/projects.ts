@@ -14,6 +14,18 @@ export type Project = {
 
 const all: Project[] = [
   {
+    name: 'vrovaris_ai_lib',
+    tagline: 'ML/AI from scratch',
+    start: '2026-09',
+    dates: 'Sept. 2026 – Present',
+    stack: ['Python', 'pytest'],
+    short: 'A machine learning library in plain Python, starting from a scalar autograd engine and a small MLP trained with its own backpropagation. The goal is to build a small GPT using this library.',
+    summary:
+      'A machine learning library written from scratch in Python. A scalar autograd engine records each operation in a computation graph and backpropagates through it in reverse topological order; neurons, layers, and an MLP are built on top. Gradients are tested against hand-worked examples and centered-difference estimates.',
+    note: 'in progress',
+    link: 'https://github.com/vrovaris/vrovaris_ai_lib',
+  },
+  {
     name: 'Shift scheduler',
     tagline: 'on-call rosters for 25 anesthesiologists',
     start: '2026-06',
